@@ -1,9 +1,7 @@
 package no.nav.omsorgsdageraleneomsorgapi
 
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.AnnenForelder
 import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Barn
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Situasjon
 import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Søknad
 import java.time.LocalDate
 
@@ -21,15 +19,6 @@ object SøknadUtils {
     val gyldigSøknad = Søknad(
         id = "123456789",
         språk = "nb",
-        annenForelder = AnnenForelder(
-            navn = "Berit",
-            fnr = "02119970078",
-            situasjon = Situasjon.FENGSEL,
-            situasjonBeskrivelse = "Sitter i fengsel..",
-            periodeOver6Måneder = false,
-            periodeFraOgMed = LocalDate.parse("2020-01-01"),
-            periodeTilOgMed = LocalDate.parse("2020-10-01")
-        ),
         barn = listOf(
             Barn(
                 navn = "Ole Dole",

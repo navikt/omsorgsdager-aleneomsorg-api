@@ -9,7 +9,6 @@ data class Søknad(
     val søknadId: String = UUID.randomUUID().toString(),
     val id: String,
     val språk: String,
-    val annenForelder: AnnenForelder,
     val barn: List<Barn> = listOf(),
     val harForståttRettigheterOgPlikter: Boolean,
     val harBekreftetOpplysninger: Boolean
@@ -21,13 +20,12 @@ data class Søknad(
         søknadId = søknadId,
         id = id,
         språk = språk,
-        annenForelder = annenForelder,
         barn = barn,
         harBekreftetOpplysninger = harBekreftetOpplysninger,
         harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter
     )
 
-    fun oppdaterBarnMedFnr(listeOverBarnOppslag: List<BarnOppslag>) {
+    fun oppdaterBarnMedIdentitetsnummer(listeOverBarnOppslag: List<BarnOppslag>) {
         barn.forEach { barn ->
             if (barn.manglerIdentitetsnummer()) {
                 barn oppdaterIdentitetsnummerMed listeOverBarnOppslag.hentIdentitetsnummerForBarn(barn.aktørId)

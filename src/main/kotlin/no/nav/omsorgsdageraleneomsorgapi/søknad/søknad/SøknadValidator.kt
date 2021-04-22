@@ -43,8 +43,6 @@ internal fun Søknad.valider() {
 
     barn.mapIndexed { index, barnSøknad -> mangler.addAll(barnSøknad.valider(index)) }
 
-    mangler.addAll(annenForelder.valider())
-
     if (mangler.isNotEmpty()) {
         throw Throwblem(ValidationProblemDetails(mangler))
     }

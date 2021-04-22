@@ -33,40 +33,25 @@ fun Route.søknadApis(
     idTokenProvider: IdTokenProvider
 ) {
 
-    @Location(SØKNAD_URL)
-    class sendSøknad
-
-    post { _ : sendSøknad ->
-        logger.info("Mottatt ny søknad.")
-
-        logger.trace("Mapper søknad")
+    post(SØKNAD_URL) {
+        logger.info("Mottatt ny søknad")
         val søknad = call.receive<Søknad>()
-        logger.trace("Søknad mappet.")
 
-        logger.trace("Oppdaterer barn med identitetsnummer")
-        val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
-        søknad.oppdaterBarnMedFnr(listeOverBarnMedFnr)
+        val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
         logger.info("Oppdatering av identitetsnummer på barn OK")
 
         val idToken = idTokenProvider.getIdToken(call)
         val callId = call.getCallId()
         val mottatt = ZonedDateTime.now(ZoneOffset.UTC)
-
-        logger.trace("Henter søker")
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
-        logger.trace("Søker hentet.")
 
-        logger.trace("Validerer søker.")
         søker.validate()
-        logger.trace("Søker OK.")
-
-        logger.trace("Validerer søknad")
         søknad.valider()
-        logger.trace("Validering OK.")
 
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
-        søknadService.registrer(
+        søknadService.leggPåKø(
             søknad = søknad,
             metadata = call.metadata(),
             mottatt = mottatt,
@@ -88,6 +73,10 @@ fun Route.søknadApis(
         logger.trace("Henter søker")
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
         logger.trace("Søker hentet.")
+
+        val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
+        logger.info("Oppdatering av identitetsnummer på barn OK")
 
         logger.trace("Validerer søknad...")
         søknad.valider()

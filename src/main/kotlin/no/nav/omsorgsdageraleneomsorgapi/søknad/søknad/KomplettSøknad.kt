@@ -9,7 +9,6 @@ data class KomplettSøknad(
     val søknadId: String,
     val id: String,
     val språk: String,
-    val annenForelder: AnnenForelder,
     val barn: List<Barn>,
     val harForståttRettigheterOgPlikter: Boolean,
     val harBekreftetOpplysninger: Boolean

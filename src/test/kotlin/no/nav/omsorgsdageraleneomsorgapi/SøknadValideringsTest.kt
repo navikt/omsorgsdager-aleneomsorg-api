@@ -5,15 +5,9 @@ import no.nav.omsorgsdageraleneomsorgapi.felles.starterMedFodselsdato
 import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.valider
 import org.junit.Test
-import java.time.ZonedDateTime
 import kotlin.test.assertTrue
 
 internal class SøknadValideringsTest {
-
-    companion object {
-        private val ugyldigFødselsnummer = "12345678900"
-        private val mottatt = ZonedDateTime.now()
-    }
 
     @Test
     fun `Tester gyldig fødselsdato dersom dnunmer`() {

@@ -13,8 +13,6 @@ import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdageraleneomsorgapi.felles.*
 import no.nav.omsorgsdageraleneomsorgapi.kafka.Topics
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.started
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.AnnenForelder
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Situasjon
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.omsorgsdagerAleneomsorgApi
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagSoker
@@ -25,7 +23,6 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -53,8 +50,7 @@ class ApplicationTest {
             .stubK9OppslagBarn()
             .stubK9OppslagSoker()
 
-        val redisServer: RedisServer = RedisServer
-            .newRedisServer().started()
+        val redisServer: RedisServer = RedisServer.newRedisServer().started()
 
         private val kafkaEnvironment = KafkaWrapper.bootstrap()
         private val kafkaTestConsumer = kafkaEnvironment.testConsumer()
@@ -212,7 +208,7 @@ class ApplicationTest {
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
+            path = VALIDERING_URL,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
@@ -293,56 +289,6 @@ class ApplicationTest {
             expectedCode = HttpStatusCode.Forbidden,
             cookie = cookie,
             requestEntity = SøknadUtils.gyldigSøknad.somJson()
-        )
-    }
-
-    @Test
-    fun `Sende søknad som inneholder annenForelder som er ugyldig`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
-            annenForelder = AnnenForelder(
-                navn = "",
-                fnr = "0-0",
-                situasjon = Situasjon.SYKDOM,
-                situasjonBeskrivelse = " ",
-                periodeOver6Måneder = false,
-                periodeFraOgMed = LocalDate.parse("2021-01-01")
-            )
-        )
-
-        requestAndAssert(
-            httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
-            expectedResponse = """
-            {
-              "type": "/problem-details/invalid-request-parameters",
-              "title": "invalid-request-parameters",
-              "status": 400,
-              "detail": "Requesten inneholder ugyldige paramtere.",
-              "instance": "about:blank",
-              "invalid_parameters": [
-                    {
-                  "type": "entity",
-                  "name": "AnnenForelder.navn",
-                  "reason": "Navn på annen forelder kan ikke være null, tom eller kun white spaces",
-                  "invalid_value": ""
-                },
-                {
-                  "type": "entity",
-                  "name": "AnnenForelder.fnr",
-                  "reason": "Fødselsnummer på annen forelder må være gyldig norsk identifikator",
-                  "invalid_value": "0-0"
-                },
-                {
-                  "type": "entity",
-                  "name": "AnnenForelder.situasjonBeskrivelse",
-                  "reason": "Situasjonsbeskrivelse på annenForelder kan ikke være null, tom eller kun white spaces når situasjon er SYKDOM",
-                  "invalid_value": " "
-                }
-              ]
-            }
-            """.trimIndent(),
-            expectedCode = HttpStatusCode.BadRequest,
-            requestEntity = søknad.somJson()
         )
     }
 
