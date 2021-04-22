@@ -1,4 +1,4 @@
-# Omsorgspenger midlertidig alene API
+# Omsorgsdager-aleneomsorg-api
 
 ![CI / CD](https://github.com/navikt/omsorgspenger-midlertidig-alene-api/workflows/CI%20/%20CD/badge.svg)
 ![NAIS Alerts](https://github.com/navikt/omsorgspenger-midlertidig-alene-api/workflows/Alerts/badge.svg)
@@ -12,7 +12,7 @@
 * [6. Drift og støtte](#11-drift-og-sttte)
 
 # 1. Kontekst
-API for søknad om å bli regnet som midlertidig alene og Kafka producer. 
+API for registrering av aleneomsorg for omsorgsdager.
 
 # 2. Funksjonelle Krav
 Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av søknad.
