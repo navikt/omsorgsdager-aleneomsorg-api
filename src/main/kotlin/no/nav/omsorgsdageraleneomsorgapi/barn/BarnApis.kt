@@ -13,18 +13,8 @@ fun Route.barnApis(
     barnService: BarnService,
     idTokenProvider: IdTokenProvider
 ) {
-
-    @Location(BARN_URL)
-    class getBarn
-
-    get { _: getBarn ->
-        call.respond(
-            BarnResponse(
-                barnService.hentNåværendeBarn(
-                    idToken = idTokenProvider.getIdToken(call),
-                    callId = call.getCallId()
-                )
-            )
-        )
+    get(BARN_URL){
+        val barn = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        call.respond(BarnResponse(barn))
     }
 }

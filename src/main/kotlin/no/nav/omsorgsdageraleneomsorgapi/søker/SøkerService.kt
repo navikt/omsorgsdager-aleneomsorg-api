@@ -15,9 +15,9 @@ class SøkerService (
         return søkerGateway.hentSøker(idToken, callId).tilSøker(ident)
     }
 
-    private fun  SøkerGateway.SokerOppslagRespons.tilSøker(fodselsnummer: String) = Søker(
+    private fun  SøkerGateway.SokerOppslagRespons.tilSøker(fødselsnummer: String) = Søker(
         aktørId = aktør_id,
-        fødselsnummer = fodselsnummer,
+        fødselsnummer = fødselsnummer,
         fødselsdato = fødselsdato,
         fornavn = fornavn,
         mellomnavn = mellomnavn,
