@@ -1,4 +1,4 @@
-package no.nav.omsorgsdageraleneomsorgapi.søknad.søknad
+package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
@@ -8,6 +8,7 @@ data class Barn (
     val navn: String,
     val aktørId: String?,
     var identitetsnummer: String?,
+    val aleneomsorg: Boolean? = null
 ) {
     fun manglerIdentitetsnummer(): Boolean = identitetsnummer.isNullOrEmpty()
 
@@ -17,6 +18,17 @@ data class Barn (
 
     fun valider(index: Int): MutableSet<Violation> {
         val mangler: MutableSet<Violation> = mutableSetOf()
+
+        if(aleneomsorg == null){
+            mangler.add(
+                Violation(
+                    parameterName = "barn[$index].aleneomsorg",
+                    parameterType = ParameterType.ENTITY,
+                    reason = "Barn.aleneomsorg kan ikke være null",
+                    invalidValue = aleneomsorg
+                )
+            )
+        }
 
         if(identitetsnummer == null){
             mangler.add(

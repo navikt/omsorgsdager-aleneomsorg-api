@@ -1,4 +1,4 @@
-package no.nav.omsorgsdageraleneomsorgapi.søknad.søknad
+package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import java.time.ZonedDateTime

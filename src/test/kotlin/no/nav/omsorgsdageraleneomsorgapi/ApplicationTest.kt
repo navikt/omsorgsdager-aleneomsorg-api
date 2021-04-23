@@ -20,7 +20,6 @@ import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubOppslagHealth
 import org.json.JSONObject
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Ignore
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -205,7 +204,7 @@ class ApplicationTest {
 
     @Test
     fun `Sende gyldig melding til validering`(){
-        val søknad = SøknadUtils.gyldigSøknad.somJson()
+        val søknad = SøknadUtils.gyldigSøknad().somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
@@ -218,7 +217,7 @@ class ApplicationTest {
 
     @Test
     fun `Sende ugyldig søknad til validering`() {
-        val ugyldigSøknad = SøknadUtils.gyldigSøknad.copy(
+        val ugyldigSøknad = SøknadUtils.gyldigSøknad().copy(
             harBekreftetOpplysninger = false,
             harForståttRettigheterOgPlikter = false
         ).somJson()
@@ -255,10 +254,9 @@ class ApplicationTest {
     }
 
     @Test
-    @Ignore
     fun `Sende gyldig søknad og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
-        val søknad = SøknadUtils.gyldigSøknad.copy(søknadId = søknadID).somJson()
+        val søknad = SøknadUtils.gyldigSøknad().copy(søknadId = søknadID).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
@@ -290,7 +288,7 @@ class ApplicationTest {
             """.trimIndent(),
             expectedCode = HttpStatusCode.Forbidden,
             cookie = cookie,
-            requestEntity = SøknadUtils.gyldigSøknad.somJson()
+            requestEntity = SøknadUtils.gyldigSøknad().somJson()
         )
     }
 

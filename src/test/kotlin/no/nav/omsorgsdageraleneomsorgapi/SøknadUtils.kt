@@ -1,8 +1,8 @@
 package no.nav.omsorgsdageraleneomsorgapi
 
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Barn
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Søknad
+import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
+import no.nav.omsorgsdageraleneomsorgapi.søknad.Søknad
 import java.time.LocalDate
 
 object SøknadUtils {
@@ -16,14 +16,15 @@ object SøknadUtils {
         etternavn = "Doffen"
     )
 
-    val gyldigSøknad = Søknad(
+    fun gyldigSøknad() = Søknad(
         id = "123456789",
         språk = "nb",
         barn = listOf(
             Barn(
                 navn = "Ole Dole",
                 identitetsnummer = "25058118020",
-                aktørId = null
+                aktørId = null,
+                aleneomsorg = true
             )
         ),
         harBekreftetOpplysninger = true,

@@ -1,4 +1,4 @@
-package no.nav.omsorgsdageraleneomsorgapi.søknad.søknad
+package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Throwblem

@@ -2,8 +2,8 @@ package no.nav.omsorgsdageraleneomsorgapi
 
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
 import no.nav.omsorgsdageraleneomsorgapi.felles.starterMedFodselsdato
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Barn
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.valider
+import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
+import no.nav.omsorgsdageraleneomsorgapi.søknad.valider
 import org.junit.Test
 import kotlin.test.assertTrue
 
@@ -17,74 +17,84 @@ internal class SøknadValideringsTest {
 
     @Test
     fun `Gyldig søknad`() {
-        val søknad = SøknadUtils.gyldigSøknad
-        søknad.valider()
+        SøknadUtils.gyldigSøknad().valider()
     }
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harForståttRettigheterOgPlikter er false`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             harForståttRettigheterOgPlikter = false
-        )
-        søknad.valider()
+        ).valider()
     }
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harBekreftetOpplysninger er false`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             harBekreftetOpplysninger = false
-        )
-        søknad.valider()
+        ).valider()
     }
 
     @Test(expected =  Throwblem::class)
     fun `Feiler dersom barn ikke har identitetsnummer`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             barn = listOf(
                 Barn(
                     navn = "Ole Dole Doffen",
                     aktørId = null,
-                    identitetsnummer = null
+                    identitetsnummer = null,
+                    aleneomsorg = true
                 )
             )
-        )
-        søknad.valider()
+        ).valider()
     }
 
     @Test(expected =  Throwblem::class)
     fun `Feiler dersom barn ikke har gyldig identitetsnummer`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             barn = listOf(
                 Barn(
                     navn = "Ole Dole Doffen",
                     aktørId = null,
-                    identitetsnummer = "ikke gyldig"
+                    identitetsnummer = "ikke gyldig",
+                    aleneomsorg = true
                 )
             )
-        )
-        søknad.valider()
+        ).valider()
     }
 
     @Test(expected =  Throwblem::class)
     fun `Feiler dersom barn ikke har navn`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             barn = listOf(
                 Barn(
                     navn = "",
                     aktørId = "12345",
-                    identitetsnummer = "12345"
+                    identitetsnummer = "12345",
+                    aleneomsorg = true
                 )
             )
-        )
-        søknad.valider()
+        ).valider()
+    }
+
+    @Test(expected =  Throwblem::class)
+    fun `Feiler dersom barn aleneomsorg er null`(){
+        SøknadUtils.gyldigSøknad().copy(
+            barn = listOf(
+                Barn(
+                    navn = "Noah",
+                    aktørId = "12345",
+                    identitetsnummer = "12345",
+                    aleneomsorg = null
+                )
+            )
+        ).valider()
     }
 
     @Test(expected =  Throwblem::class)
     fun `Feiler dersom barn er tom liste`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        SøknadUtils.gyldigSøknad().copy(
             barn = listOf()
-        )
-        søknad.valider()
+        ).valider()
     }
 
 }

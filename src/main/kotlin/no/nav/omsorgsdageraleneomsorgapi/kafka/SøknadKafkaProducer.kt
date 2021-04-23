@@ -7,7 +7,7 @@ import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.omsorgsdageraleneomsorgapi.felles.Metadata
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.felles.somJson
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.KomplettSøknad
+import no.nav.omsorgsdageraleneomsorgapi.søknad.KomplettSøknad
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.Serializer

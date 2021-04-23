@@ -12,7 +12,8 @@
   "externalHosts": [
     "api-gw.oera.no",
     "oauth2.googleapis.com",
-    "login.microsoftonline.com"
+    "login.microsoftonline.com",
+    "https://unleash.nais.io/"
   ],
   "env": {
     "REDIS_HOST": "omsorgsdager-aleneomsorg-api-redis.dusseldorf.svc.cluster.local",

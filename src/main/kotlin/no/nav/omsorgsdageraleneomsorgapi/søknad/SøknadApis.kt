@@ -18,8 +18,6 @@ import no.nav.omsorgsdageraleneomsorgapi.general.metadata
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.Søknad
-import no.nav.omsorgsdageraleneomsorgapi.søknad.søknad.valider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
@@ -62,9 +60,8 @@ fun Route.søknadApis(
                 mottatt = mottatt,
                 søker = søker
             )
-        } else {
-            logger.info("OBS; Søkad IKKE lagt på kø pga unleash.")
-        }
+        } else logger.info("Søknad ikke lagt på kø pga Unleashfeature ")
+
 
         call.respond(HttpStatusCode.Accepted)
     }
