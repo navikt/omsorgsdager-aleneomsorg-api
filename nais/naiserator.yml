@@ -51,9 +51,7 @@ spec:
   vault:
     enabled: false
   envFrom:
-    - secret: omsorgsdager-aleneomsorg-api.apigw-apikey
-    - secret: omsorgsdager-aleneomsorg-api.sts-credentials
-    - secret: omsorgsdager-aleneomsorg-api.storage-redis
+    - secret: omsorgsdager-aleneomsorg-api
     - configmap: loginservice-idporten
   env:
   {{#each env}}
