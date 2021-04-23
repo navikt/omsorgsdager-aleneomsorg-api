@@ -22,6 +22,8 @@ import no.nav.helse.dusseldorf.ktor.jackson.JacksonStatusPages
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
 import no.nav.helse.dusseldorf.ktor.metrics.init
+import no.nav.helse.dusseldorf.ktor.unleash.UnleashService
+import no.nav.helse.dusseldorf.ktor.unleash.unleashConfigBuilder
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnGateway
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.barn.barnApis
@@ -127,6 +129,13 @@ fun Application.omsorgsdageraleneomsorgapi() {
             cache = configuration.cache()
         )
 
+        val søknadService = SøknadService(
+            søkerService = søkerService,
+            kafkaProducer = søknadKafkaProducer
+        )
+
+        val unleashService = UnleashService(configuration.config.unleashConfigBuilder())
+
         environment.monitor.subscribe(ApplicationStopping) {
             logger.info("Stopper Kafka Producer.")
             søknadKafkaProducer.stop()
@@ -162,15 +171,14 @@ fun Application.omsorgsdageraleneomsorgapi() {
                 idTokenProvider = idTokenProvider,
                 barnService = barnService,
                 søkerService = søkerService,
-                søknadService = SøknadService(
-                    søkerService = søkerService,
-                    kafkaProducer = søknadKafkaProducer
-                )
+                søknadService = søknadService,
+                unleashService = unleashService
             )
         }
 
         val healthService = HealthService(
             healthChecks = setOf(
+                unleashService,
                 søknadKafkaProducer,
                 søkerGateway,
                 barnGateway

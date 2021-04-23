@@ -29,7 +29,7 @@ class SøknadService(
         logger.info(formaterStatuslogging(søknad.søknadId, "registreres"))
 
         val komplettSøknad = søknad.tilKomplettSøknad(søker, mottatt)
-
-        kafkaProducer.produce(søknad = komplettSøknad, metadata = metadata)
+        logger.info("Søknad ble forsøkt lagt på kø") //TODO 23.04.2021 - Fjerne
+        //kafkaProducer.produce(søknad = komplettSøknad, metadata = metadata) //TODO 23.04.2021 - Fjerne kommentar
     }
 }

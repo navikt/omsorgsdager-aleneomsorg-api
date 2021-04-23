@@ -6,8 +6,10 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.helse.dusseldorf.ktor.unleash.UnleashService
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.felles.SØKNAD_URL
+import no.nav.omsorgsdageraleneomsorgapi.felles.UnleashFeatures
 import no.nav.omsorgsdageraleneomsorgapi.felles.VALIDERING_URL
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdTokenProvider
@@ -30,7 +32,8 @@ fun Route.søknadApis(
     søknadService: SøknadService,
     barnService: BarnService,
     søkerService: SøkerService,
-    idTokenProvider: IdTokenProvider
+    idTokenProvider: IdTokenProvider,
+    unleashService: UnleashService
 ) {
 
     post(SØKNAD_URL) {
@@ -51,12 +54,17 @@ fun Route.søknadApis(
 
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
-        søknadService.leggPåKø(
-            søknad = søknad,
-            metadata = call.metadata(),
-            mottatt = mottatt,
-            søker = søker
-        )
+        val skalLeggePåKø = unleashService.isEnabled(UnleashFeatures.SKAL_LEGGE_PÅ_KØ, true)
+        if(skalLeggePåKø) {
+            søknadService.leggPåKø(
+                søknad = søknad,
+                metadata = call.metadata(),
+                mottatt = mottatt,
+                søker = søker
+            )
+        } else {
+            logger.info("OBS; Søkad IKKE lagt på kø pga unleash.")
+        }
 
         call.respond(HttpStatusCode.Accepted)
     }
