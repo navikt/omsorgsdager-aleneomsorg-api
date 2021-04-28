@@ -19,7 +19,7 @@ data class Barn (
     fun valider(index: Int): MutableSet<Violation> {
         val mangler: MutableSet<Violation> = mutableSetOf()
 
-        if(aleneomsorg == null){
+        if(aleneomsorg er null){
             mangler.add(
                 Violation(
                     parameterName = "barn[$index].aleneomsorg",

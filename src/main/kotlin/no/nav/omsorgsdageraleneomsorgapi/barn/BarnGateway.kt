@@ -45,10 +45,8 @@ class BarnGateway(
 
     }
 
-    suspend fun hentBarn(
-        idToken: IdToken,
-        callId: CallId
-    ): List<BarnOppslagDTO> {
+    suspend fun hentBarn(idToken: IdToken, callId: CallId): List<BarnOppslagDTO> {
+
         val barnUrl = Url.buildURL(
             baseUrl = baseUrl,
             pathParts = listOf("meg"),

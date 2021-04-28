@@ -2,7 +2,6 @@ package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -25,7 +24,6 @@ import java.time.ZonedDateTime
 
 private val logger: Logger = LoggerFactory.getLogger("nav.soknadApis")
 
-@KtorExperimentalLocationsAPI
 fun Route.søknadApis(
     søknadService: SøknadService,
     barnService: BarnService,
@@ -62,30 +60,22 @@ fun Route.søknadApis(
             )
         } else logger.info("Søknad ikke lagt på kø pga Unleashfeature ")
 
-
         call.respond(HttpStatusCode.Accepted)
     }
 
-    @Location(VALIDERING_URL)
-    class validerSoknad
-
-    post { _: validerSoknad ->
+    post(VALIDERING_URL) {
         val søknad = call.receive<Søknad>()
         val idToken = idTokenProvider.getIdToken(call)
         val callId = call.getCallId()
         val mottatt = ZonedDateTime.now(ZoneOffset.UTC)
 
-        logger.trace("Henter søker")
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
-        logger.trace("Søker hentet.")
 
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
         søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
         logger.info("Oppdatering av identitetsnummer på barn OK")
 
-        logger.trace("Validerer søknad...")
         søknad.valider()
-        logger.trace("Validering Ok.")
         call.respond(HttpStatusCode.Accepted)
     }
 }

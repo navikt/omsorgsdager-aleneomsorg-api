@@ -52,7 +52,7 @@ Eksempel json;
 
 # 4. Distribusjon av tjenesten (deployment)
 Distribusjon av tjenesten er gjort med bruk av Github Actions.
-[Omsorgspenger-midlertidig-alene-API CI / CD](https://github.com/navikt/omsorgsdager-aleneomsorg-api/actions)
+[Omsorgsdager-aleneomsorg-api CI / CD](https://github.com/navikt/omsorgsdager-aleneomsorg-api/actions)
 
 Push til dev-* brancher vil teste, bygge og deploye til dev/staging miljø.
 Push/merge til master branche vil teste, bygge og deploye til produksjonsmiljø.

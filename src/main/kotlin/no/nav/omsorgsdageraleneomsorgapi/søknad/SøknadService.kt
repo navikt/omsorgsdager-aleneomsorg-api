@@ -19,7 +19,7 @@ class SøknadService(
         private val logger: Logger = LoggerFactory.getLogger(SøknadService::class.java)
     }
 
-    suspend fun leggPåKø(
+    fun leggPåKø(
         søknad: Søknad,
         metadata: Metadata,
         mottatt: ZonedDateTime,
