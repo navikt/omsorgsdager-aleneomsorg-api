@@ -130,7 +130,6 @@ fun Application.omsorgsdageraleneomsorgapi() {
         )
 
         val søknadService = SøknadService(
-            søkerService = søkerService,
             kafkaProducer = søknadKafkaProducer
         )
 

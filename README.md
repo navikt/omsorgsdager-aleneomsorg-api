@@ -17,7 +17,7 @@ API for registrering av aleneomsorg for omsorgsdager.
 # 2. Funksjonelle Krav
 Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av søknad.
 
-API mottar søknaden, validerer og legger den videre på en kafka-topic.
+API mottar søknaden, validerer og legger den videre på en kafka-topic som omsorgsdager-aleneomsorg-prosessering konsumerer
 
 # 3. Endepunkter
 **GET @/soker --> Gir 200 respons med json av søker**
