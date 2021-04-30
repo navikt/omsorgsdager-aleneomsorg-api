@@ -20,7 +20,7 @@ class SøknadKafkaProducer(
     private companion object {
         private val NAME = "SøknadProducer"
         private val OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC = TopicUse(
-            name = Topics.MOTTATT_OMS_MIDLERTIDIG_ALENE,
+            name = Topics.MOTTATT_OMD_ALENEOMSORG,
             valueSerializer = SøknadSerializer()
         )
 

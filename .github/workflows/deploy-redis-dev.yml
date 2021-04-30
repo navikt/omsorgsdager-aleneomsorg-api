@@ -1,0 +1,22 @@
+name: Deploy Redis dev-gcp
+on:
+  push: # Deploys automatically to dev-gcp if there is a change in redis file.
+    paths:
+      - "redis-config.yml"
+    branches:
+      - 'dev-*'
+
+jobs:
+  deploy-redis-dev-gcp:
+    name: Deploy redis to dev-gcp
+    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.4
+      - name: Deploy redis to dev-gcp
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: "redis-config.yml" 

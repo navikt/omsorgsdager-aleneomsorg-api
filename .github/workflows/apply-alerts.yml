@@ -11,7 +11,7 @@ on:
       - 'master'
       - 'dev-**'
 
-jobs:
+#jobs:
 #  deploy-dev-gcp:
 #    name: Deploy to dev-gcp
 #    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*

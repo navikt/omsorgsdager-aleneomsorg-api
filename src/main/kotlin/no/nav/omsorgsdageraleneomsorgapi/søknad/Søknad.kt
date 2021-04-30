@@ -2,11 +2,13 @@ package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnOppslag
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
 
 data class Søknad(
     val søknadId: String = UUID.randomUUID().toString(),
+    val mottatt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC),
     val id: String,
     val språk: String,
     val barn: List<Barn> = listOf(),
@@ -14,7 +16,7 @@ data class Søknad(
     val harBekreftetOpplysninger: Boolean
 ) {
 
-    fun tilKomplettSøknad(søker: Søker, mottatt: ZonedDateTime): KomplettSøknad = KomplettSøknad(
+    fun tilKomplettSøknad(søker: Søker): KomplettSøknad = KomplettSøknad(
         mottatt = mottatt,
         søker = søker,
         søknadId = søknadId,
@@ -34,8 +36,4 @@ data class Søknad(
     }
 }
 
-private fun List<BarnOppslag>.hentIdentitetsnummerForBarn(aktørId: String?): String? {
-    return find {
-        it.aktørId == aktørId
-    }?.identitetsnummer
-}
+private fun List<BarnOppslag>.hentIdentitetsnummerForBarn(aktørId: String?) = find { it.aktørId == aktørId }?.identitetsnummer

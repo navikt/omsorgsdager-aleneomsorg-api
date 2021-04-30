@@ -7,10 +7,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.unleash.UnleashService
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
-import no.nav.omsorgsdageraleneomsorgapi.felles.SØKNAD_URL
-import no.nav.omsorgsdageraleneomsorgapi.felles.UnleashFeatures
-import no.nav.omsorgsdageraleneomsorgapi.felles.VALIDERING_URL
-import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
+import no.nav.omsorgsdageraleneomsorgapi.felles.*
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdageraleneomsorgapi.general.getCallId
 import no.nav.omsorgsdageraleneomsorgapi.general.metadata
@@ -19,8 +16,6 @@ import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 private val logger: Logger = LoggerFactory.getLogger("nav.soknadApis")
 
@@ -33,8 +28,8 @@ fun Route.søknadApis(
 ) {
 
     post(SØKNAD_URL) {
-        logger.info("Mottatt ny søknad")
         val søknad = call.receive<Søknad>()
+        logger.info("Mottatt ny søknad med søknadId ${søknad.søknadId}")
 
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
         søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
@@ -42,20 +37,18 @@ fun Route.søknadApis(
 
         val idToken = idTokenProvider.getIdToken(call)
         val callId = call.getCallId()
-        val mottatt = ZonedDateTime.now(ZoneOffset.UTC)
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
 
         søker.validate()
         søknad.valider()
 
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+        logger.info("OBS SKAL IKKE VISES I PROD! Søknad sendt inn: ${søknad.somJson()}") //TODO 29.04.2021 - Fjerne før prodsetting
 
-        val skalLeggePåKø = unleashService.isEnabled(UnleashFeatures.SKAL_LEGGE_PÅ_KØ, true)
-        if(skalLeggePåKø) {
+        if(unleashService.isEnabled(UnleashFeatures.SKAL_LEGGE_PÅ_KØ, true)) {
             søknadService.leggPåKø(
                 søknad = søknad,
                 metadata = call.metadata(),
-                mottatt = mottatt,
                 søker = søker
             )
         } else logger.info("Søknad ikke lagt på kø pga Unleashfeature ")
@@ -67,7 +60,6 @@ fun Route.søknadApis(
         val søknad = call.receive<Søknad>()
         val idToken = idTokenProvider.getIdToken(call)
         val callId = call.getCallId()
-        val mottatt = ZonedDateTime.now(ZoneOffset.UTC)
 
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
 

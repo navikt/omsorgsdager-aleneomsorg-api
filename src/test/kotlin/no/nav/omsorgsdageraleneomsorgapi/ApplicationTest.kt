@@ -8,8 +8,8 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import no.nav.common.KafkaEnvironment
+import no.nav.helse.TestUtils.getAuthCookie
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdageraleneomsorgapi.felles.*
 import no.nav.omsorgsdageraleneomsorgapi.kafka.Topics
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.started
@@ -325,7 +325,7 @@ class ApplicationTest {
     }
 
     private fun hentSøknadSendtTilProsessering(soknadId: String): JSONObject {
-        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMS_MIDLERTIDIG_ALENE).data
+        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMD_ALENEOMSORG).data
     }
 
     private fun verifiserAtInnholdetErLikt(
@@ -334,9 +334,6 @@ class ApplicationTest {
     ) {
         assertTrue(søknadPlukketFraTopic.has("søker"))
         søknadPlukketFraTopic.remove("søker") //Fjerner søker siden det settes i komplettSøknad
-
-        assertTrue(søknadPlukketFraTopic.has("mottatt"))
-        søknadPlukketFraTopic.remove("mottatt") //Fjerner mottatt siden det settes i komplettSøknad
 
         søknadPlukketFraTopic.remove("k9Format") //Fjerner k9Format
 
