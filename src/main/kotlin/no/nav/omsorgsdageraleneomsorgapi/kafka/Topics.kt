@@ -17,5 +17,5 @@ internal data class TopicUse<V>(
 }
 
 object Topics {
-    const val MOTTATT_OMD_ALENEOMSORG = "privat-omsorgsdager-aleneomsorg-api-mottatt"
+    const val MOTTATT_OMD_ALENEOMSORG = "privat-omsorgsdager-aleneomsorg-mottatt"
 }
