@@ -1,0 +1,13 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: privat-omsorgsdager-aleneomsorg-mottatt
+  namespace: dusseldorf
+  labels:
+    team: dusseldorf
+spec:
+  pool: {{kafka-pool}}
+  acl:
+    - team: dusseldorf
+      application: omsorgsdager-aleneomsorg-api
+      access: write
