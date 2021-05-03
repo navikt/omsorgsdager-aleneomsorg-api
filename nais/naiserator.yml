@@ -21,7 +21,7 @@ spec:
         - host: {{host}}
         {{/each}}
   kafka:
-    pool: nav-dev
+    pool: {{kafka-pool}}
   liveness:
     path: isalive
     initialDelay: 20

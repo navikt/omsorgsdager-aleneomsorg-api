@@ -6,7 +6,7 @@ metadata:
   labels:
     team: dusseldorf
 spec:
-  pool: nav-dev
+  pool: {{kafka-pool}}
   acl:
     - team: dusseldorf
       application: omsorgsdager-aleneomsorg-api
