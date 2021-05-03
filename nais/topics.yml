@@ -10,4 +10,4 @@ spec:
   acl:
     - team: dusseldorf
       application: omsorgsdager-aleneomsorg-api
-      access: write
+      access: readwrite
