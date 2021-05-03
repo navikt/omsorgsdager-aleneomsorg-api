@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - 'dev-*'
-    paths:
-      - '.nais/topics.yml'
 
 jobs:
   deploy-kafka-topics-dev:
