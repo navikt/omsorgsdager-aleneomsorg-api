@@ -50,9 +50,6 @@ object TestConfiguration {
         // Kafka
         kafkaEnvironment?.let {
             map["nav.kafka.bootstrap_servers"] = it.brokersURL
-            map["nav.kafka.truststore_path"] = "src/test/resources/client.truststore.jks"
-            map["nav.kafka.credstore_password"] = "password"
-            map["nav.kafka.keystore_path"] = "src/test/resources/keystore.pkcs12"
             map["nav.kafka.username"] = it.username()
             map["nav.kafka.password"] = it.password()
         }

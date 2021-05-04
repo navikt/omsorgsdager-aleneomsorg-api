@@ -11,7 +11,6 @@ import no.nav.helse.dusseldorf.ktor.core.getOptionalList
 import no.nav.helse.dusseldorf.ktor.core.getOptionalString
 import no.nav.helse.dusseldorf.ktor.core.getRequiredString
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.ApiGatewayApiKey
-import no.nav.omsorgsdageraleneomsorgapi.kafka.KafkaAivenConfig
 import no.nav.omsorgsdageraleneomsorgapi.kafka.KafkaConfig
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SslConfigs
@@ -54,33 +53,24 @@ data class Configuration(val config : ApplicationConfig) {
     }
 
     internal fun getKafkaConfig() = config.getRequiredString("nav.kafka.bootstrap_servers", secret = false).let { bootstrapServers ->
-        val trustStore = config.getOptionalString("nav.trust_store.path", secret = false)?.let { trustStorePath ->
-            config.getOptionalString("nav.trust_store.password", secret = true)?.let { trustStorePassword ->
-                Pair(trustStorePath, trustStorePassword)
+        val trustStore = config.getOptionalString("nav.kafka.truststore_path", secret = false)?.let { trustStorePath ->
+            config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                Pair(trustStorePath, credstorePassword)
+            }
+        }
+
+        val keyStore = config.getOptionalString("nav.kafka.keystore_path", secret = false)?.let { keystorePath ->
+            config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                Pair(keystorePath, credstorePassword)
             }
         }
 
         KafkaConfig(
             bootstrapServers = bootstrapServers,
             credentials = Pair(config.getRequiredString("nav.kafka.username", secret = false), config.getRequiredString("nav.kafka.password", secret = true)),
-            trustStore = trustStore
+            trustStore = trustStore,
+            keyStore = keyStore
         )
-    }
-
-    internal fun getKafkaAivenConfig(): KafkaAivenConfig {
-        val properties = Properties().apply {
-            put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, config.getRequiredString("nav.kafka.bootstrap_servers", secret = true))
-            put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
-            put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
-            put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks")
-            put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
-            put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, config.getRequiredString("nav.kafka.truststore_path", secret = true))
-            put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, config.getRequiredString("nav.kafka.credstore_password", secret = true))
-            put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getRequiredString("nav.kafka.keystore_path", secret = true))
-            put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, config.getRequiredString("nav.kafka.credstore_password", secret = true))
-        }
-
-        return KafkaAivenConfig(properties)
     }
 
     internal fun getRedisPort() = config.getRequiredString("nav.redis.port", secret = false).toInt()

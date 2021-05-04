@@ -15,7 +15,7 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
 class SøknadKafkaProducer(
-    val kafkaConfig: KafkaAivenConfig
+    val kafkaConfig: KafkaConfig
 ) : HealthCheck {
     private companion object {
         private val NAME = "SøknadProducer"

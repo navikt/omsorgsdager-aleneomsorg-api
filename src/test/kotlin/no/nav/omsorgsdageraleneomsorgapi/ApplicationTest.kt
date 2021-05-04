@@ -92,7 +92,6 @@ class ApplicationTest {
     }
 
     @Test
-    @Ignore
     fun `test isready, isalive, health og metrics`() {
         with(engine) {
             handleRequest(HttpMethod.Get, "/isready") {}.apply {
@@ -256,7 +255,6 @@ class ApplicationTest {
     }
 
     @Test
-    @Ignore
     fun `Sende gyldig søknad og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
         val søknad = SøknadUtils.gyldigSøknad().copy(søknadId = søknadID).somJson()
