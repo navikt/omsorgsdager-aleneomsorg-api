@@ -116,7 +116,7 @@ fun Application.omsorgsdageraleneomsorgapi() {
         )
 
         val søknadKafkaProducer = SøknadKafkaProducer(
-            kafkaConfig = configuration.getKafkaConfig()
+            kafkaConfig = configuration.getKafkaAivenConfig()
         )
 
         val barnGateway = BarnGateway(
