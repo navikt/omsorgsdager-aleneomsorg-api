@@ -20,7 +20,7 @@ class KafkaConfig(
 ) {
     private val producer = Properties().apply {
         put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        if(trustStore == null || keyStore == null) medCredentials(credentials)
+        if(trustStore == null || keyStore == null) medCredentials(credentials) //For å skille mellom test/miljø
         medTrustStore(trustStore)
         medKeyStore(keyStore)
     }

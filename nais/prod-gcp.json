@@ -1,6 +1,7 @@
 {
   "app": "omsorgsdager-aleneomsorg-api",
   "cluster": "prod-gcp",
+  "kafka-pool" : "nav-prod",
   "namespace": "dusseldorf",
   "team": "dusseldorf",
   "minReplicas": "1",

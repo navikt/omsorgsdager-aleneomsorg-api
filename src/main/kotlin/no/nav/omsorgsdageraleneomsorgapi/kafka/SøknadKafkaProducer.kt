@@ -14,9 +14,7 @@ import org.apache.kafka.common.serialization.Serializer
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-class SøknadKafkaProducer(
-    val kafkaConfig: KafkaConfig
-) : HealthCheck {
+class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
     private companion object {
         private val NAME = "SøknadProducer"
         private val OMD_ALENEOMSORG_MOTTATT_TOPIC = TopicUse(
@@ -33,7 +31,7 @@ class SøknadKafkaProducer(
         OMD_ALENEOMSORG_MOTTATT_TOPIC.valueSerializer
     )
 
-    internal fun produce(
+    internal fun produserKafkamelding(
         søknad: KomplettSøknad,
         metadata: Metadata
     ) {

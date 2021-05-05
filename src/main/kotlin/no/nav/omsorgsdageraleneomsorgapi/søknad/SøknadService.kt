@@ -13,7 +13,7 @@ class SøknadService(private val kafkaProducer: SøknadKafkaProducer) {
 
     fun leggPåKø(søknad: Søknad, metadata: Metadata, søker: Søker) {
         logger.info(formaterStatuslogging(søknad.søknadId, "registreres"))
-        kafkaProducer.produce(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+        kafkaProducer.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
     }
 
 }
