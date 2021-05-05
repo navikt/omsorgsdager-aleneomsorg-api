@@ -12,15 +12,15 @@ import java.util.*
 
 private val logger: Logger = LoggerFactory.getLogger(KafkaConfig::class.java)
 private const val ID_PREFIX = "srv-omd-alene-api-"
+
 class KafkaConfig(
     bootstrapServers: String,
-    val credentials: Pair<String, String>,
     trustStore: Pair<String, String>?,
     keyStore: Pair<String, String>?
 ) {
     private val producer = Properties().apply {
         put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        if(trustStore == null || keyStore == null) medCredentials(credentials) //For å skille mellom test/miljø
+        if(trustStore == null || keyStore == null) medCredentials(Pair("srvkafkaclient", "kafkaclient")) //For å skille mellom test/miljø
         medTrustStore(trustStore)
         medKeyStore(keyStore)
     }
