@@ -11,7 +11,6 @@
     "https://omsorgsdager-aleneomsorg-api.dev.nav.no"
   ],
   "externalHosts": [
-    "api-gw-q1.oera.no",
     "oauth2.googleapis.com",
     "login.microsoftonline.com",
     "https://unleash.nais.io/"
