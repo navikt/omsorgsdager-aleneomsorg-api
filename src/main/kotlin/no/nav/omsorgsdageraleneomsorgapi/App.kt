@@ -58,7 +58,6 @@ fun Application.omsorgsdageraleneomsorgapi() {
     System.setProperty("dusseldorf.ktor.serializeProblemDetailsWithContentNegotiation", "true")
 
     val configuration = Configuration(environment.config)
-    val apiGatewayApiKey = configuration.getApiGatewayApiKey()
 
     install(ContentNegotiation) {
         jackson {
@@ -106,34 +105,17 @@ fun Application.omsorgsdageraleneomsorgapi() {
 
     install(Routing) {
 
-        val søkerGateway = SøkerGateway(
-            baseUrl = configuration.getK9OppslagUrl(),
-            apiGatewayApiKey = apiGatewayApiKey
-        )
-
-        val søkerService = SøkerService(
-            søkerGateway = søkerGateway
-        )
-
-        val søknadKafkaProducer = SøknadKafkaProducer(
-            kafkaConfig = configuration.getKafkaConfig()
-        )
-
-        val barnGateway = BarnGateway(
-            baseUrl = configuration.getK9OppslagUrl(),
-            apiGatewayApiKey = apiGatewayApiKey
-        )
+        val søkerGateway = SøkerGateway(baseUrl = configuration.getK9OppslagUrl())
+        val søkerService = SøkerService(søkerGateway = søkerGateway)
+        val søknadKafkaProducer = SøknadKafkaProducer(kafkaConfig = configuration.getKafkaConfig())
+        val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
+        val søknadService = SøknadService(kafkaProducer = søknadKafkaProducer)
+        val unleashService = UnleashService(configuration.config.unleashConfigBuilder())
 
         val barnService = BarnService(
             barnGateway = barnGateway,
             cache = configuration.cache()
         )
-
-        val søknadService = SøknadService(
-            kafkaProducer = søknadKafkaProducer
-        )
-
-        val unleashService = UnleashService(configuration.config.unleashConfigBuilder())
 
         environment.monitor.subscribe(ApplicationStopping) {
             logger.info("Stopper Kafka Producer.")

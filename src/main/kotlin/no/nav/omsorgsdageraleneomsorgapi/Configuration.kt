@@ -10,14 +10,9 @@ import no.nav.helse.dusseldorf.ktor.auth.withAdditionalClaimRules
 import no.nav.helse.dusseldorf.ktor.core.getOptionalList
 import no.nav.helse.dusseldorf.ktor.core.getOptionalString
 import no.nav.helse.dusseldorf.ktor.core.getRequiredString
-import no.nav.omsorgsdageraleneomsorgapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdageraleneomsorgapi.kafka.KafkaConfig
-import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.common.config.SslConfigs
-import org.apache.kafka.common.security.auth.SecurityProtocol
 import java.net.URI
 import java.time.Duration
-import java.util.*
 
 @KtorExperimentalAPI
 data class Configuration(val config : ApplicationConfig) {
@@ -31,9 +26,8 @@ data class Configuration(val config : ApplicationConfig) {
         "login-service-v2" to loginServiceClaimRules
     ))
 
-    internal fun getCookieName(): String {
-        return config.getRequiredString("nav.authorization.cookie_name", secret = false)
-    }
+    internal fun getCookieName(): String = config.getRequiredString("nav.authorization.cookie_name", secret = false)
+
 
     internal fun getWhitelistedCorsAddreses(): List<URI> {
         return config.getOptionalList(
@@ -46,11 +40,6 @@ data class Configuration(val config : ApplicationConfig) {
     }
 
     internal fun getK9OppslagUrl() = URI(config.getRequiredString("nav.gateways.k9_oppslag_url", secret = false))
-
-    internal fun getApiGatewayApiKey() : ApiGatewayApiKey {
-        val apiKey = config.getRequiredString(key = "nav.authorization.api_gateway.api_key", secret = true)
-        return ApiGatewayApiKey(value = apiKey)
-    }
 
     internal fun getKafkaConfig() = config.getRequiredString("nav.kafka.bootstrap_servers", secret = false).let { bootstrapServers ->
         val trustStore = config.getOptionalString("nav.kafka.truststore_path", secret = false)?.let { trustStorePath ->

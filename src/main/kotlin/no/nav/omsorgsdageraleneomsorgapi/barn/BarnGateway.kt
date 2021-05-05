@@ -13,7 +13,6 @@ import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
 import no.nav.omsorgsdageraleneomsorgapi.felles.k9SelvbetjeningOppslagKonfigurert
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
-import no.nav.omsorgsdageraleneomsorgapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
 import no.nav.omsorgsdageraleneomsorgapi.general.oppslag.K9OppslagGateway
 import org.slf4j.Logger
@@ -23,9 +22,8 @@ import java.time.Duration
 import java.time.LocalDate
 
 class BarnGateway(
-    baseUrl: URI,
-    private val apiGatewayApiKey: ApiGatewayApiKey
-) : K9OppslagGateway(baseUrl, apiGatewayApiKey) {
+    baseUrl: URI
+) : K9OppslagGateway(baseUrl) {
 
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger("nav.BarnGateway")
@@ -103,8 +101,7 @@ class BarnGateway(
         ).toString()
             .httpGet()
             .header(
-                HttpHeaders.Accept to "text/plain",
-                apiGatewayApiKey.headerKey to apiGatewayApiKey.value
+                HttpHeaders.Accept to "text/plain"
             )
 
         val (_, _, result) = Operation.monitored(
