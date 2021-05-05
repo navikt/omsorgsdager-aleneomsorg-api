@@ -1,4 +1,4 @@
-name: Create/Update Kafka Topics
+name: Create/Update Kafka Topics Prod
 
 on:
   push:
