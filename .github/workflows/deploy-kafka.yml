@@ -1,19 +1,13 @@
-# This workflow trigger on push to any branch.
-name: Alerts
+name: Create or update Kafka topics
+
 on:
   push:
     paths:
-      - 'nais/alerterator.yml'
-      - 'nais/dev-gcp.json'
-      - 'nais/prod-gcp.json'
-      - '.github/workflows/apply-alerts.yml'
-    branches:
-      - 'master'
-      - 'dev-**'
+      - 'nais/topics.yml'
 
 jobs:
-  deploy-dev-gcp:
-    name: Deploy to dev-gcp
+  deploy-kafka-topics-dev:
+    name: Deploy to Aiven Dev
     if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*
     runs-on: ubuntu-latest
     steps:
@@ -22,11 +16,11 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: nais/alerterator.yml
-          VARS: nais/dev-gcp.json
+          VAR: kafka-pool=nav-dev
+          RESOURCE: nais/topics.yml
 
-  deploy-prod-gcp:
-    name: Deploy to prod-gcp
+  deploy-kafka-topics-prod:
+    name: Deploy to Aiven Prod
     if: startsWith(github.ref, 'refs/heads/master')  # If the branch is master
     runs-on: ubuntu-latest
     steps:
@@ -35,5 +29,5 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: nais/alerterator.yml
-          VARS: nais/prod-gcp.json
+          VAR: kafka-pool=nav-prod
+          RESOURCE: nais/topics.yml

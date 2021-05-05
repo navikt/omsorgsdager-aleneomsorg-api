@@ -20,6 +20,7 @@ import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubOppslagHealth
 import org.json.JSONObject
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

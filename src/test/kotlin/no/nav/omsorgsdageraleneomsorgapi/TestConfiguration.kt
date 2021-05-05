@@ -25,7 +25,6 @@ object TestConfiguration {
             Pair("nav.authorization.cookie_name", "localhost-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
             Pair("nav.cors.addresses", corsAdresses),
-            Pair("nav.authorization.api_gateway.api_key", "verysecret"),
             Pair("nav.unleash.appName", "omsorgsdager-aleneomsorg-api"),
             Pair("nav.unleash.instanceId", "app"),
             Pair("nav.unleash.environment", "test"),

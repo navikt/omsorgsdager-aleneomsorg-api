@@ -10,7 +10,6 @@ import no.nav.helse.dusseldorf.ktor.auth.withAdditionalClaimRules
 import no.nav.helse.dusseldorf.ktor.core.getOptionalList
 import no.nav.helse.dusseldorf.ktor.core.getOptionalString
 import no.nav.helse.dusseldorf.ktor.core.getRequiredString
-import no.nav.omsorgsdageraleneomsorgapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdageraleneomsorgapi.kafka.KafkaConfig
 import java.net.URI
 import java.time.Duration
@@ -27,9 +26,8 @@ data class Configuration(val config : ApplicationConfig) {
         "login-service-v2" to loginServiceClaimRules
     ))
 
-    internal fun getCookieName(): String {
-        return config.getRequiredString("nav.authorization.cookie_name", secret = false)
-    }
+    internal fun getCookieName(): String = config.getRequiredString("nav.authorization.cookie_name", secret = false)
+
 
     internal fun getWhitelistedCorsAddreses(): List<URI> {
         return config.getOptionalList(
@@ -43,22 +41,24 @@ data class Configuration(val config : ApplicationConfig) {
 
     internal fun getK9OppslagUrl() = URI(config.getRequiredString("nav.gateways.k9_oppslag_url", secret = false))
 
-    internal fun getApiGatewayApiKey() : ApiGatewayApiKey {
-        val apiKey = config.getRequiredString(key = "nav.authorization.api_gateway.api_key", secret = true)
-        return ApiGatewayApiKey(value = apiKey)
-    }
-
     internal fun getKafkaConfig() = config.getRequiredString("nav.kafka.bootstrap_servers", secret = false).let { bootstrapServers ->
-        val trustStore = config.getOptionalString("nav.trust_store.path", secret = false)?.let { trustStorePath ->
-            config.getOptionalString("nav.trust_store.password", secret = true)?.let { trustStorePassword ->
-                Pair(trustStorePath, trustStorePassword)
+        val trustStore = config.getOptionalString("nav.kafka.truststore_path", secret = false)?.let { trustStorePath ->
+            config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                Pair(trustStorePath, credstorePassword)
+            }
+        }
+
+        val keyStore = config.getOptionalString("nav.kafka.keystore_path", secret = false)?.let { keystorePath ->
+            config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                Pair(keystorePath, credstorePassword)
             }
         }
 
         KafkaConfig(
             bootstrapServers = bootstrapServers,
             credentials = Pair(config.getRequiredString("nav.kafka.username", secret = false), config.getRequiredString("nav.kafka.password", secret = true)),
-            trustStore = trustStore
+            trustStore = trustStore,
+            keyStore = keyStore
         )
     }
 
