@@ -11,3 +11,6 @@ spec:
     - team: dusseldorf
       application: omsorgsdager-aleneomsorg-api
       access: readwrite
+    - team: dusseldorf
+      application: omsorgsdager-aleneomsorg-prosessering
+      access: read
