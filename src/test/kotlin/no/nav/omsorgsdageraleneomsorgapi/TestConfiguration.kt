@@ -24,11 +24,7 @@ object TestConfiguration {
             Pair("ktor.deployment.port","$port"),
             Pair("nav.authorization.cookie_name", "localhost-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
-            Pair("nav.cors.addresses", corsAdresses),
-            Pair("nav.unleash.appName", "omsorgsdager-aleneomsorg-api"),
-            Pair("nav.unleash.instanceId", "app"),
-            Pair("nav.unleash.environment", "test"),
-            Pair("nav.unleash.unleashAPI", "http://localhost:8080/api/")
+            Pair("nav.cors.addresses", corsAdresses)
         )
 
         // Clients

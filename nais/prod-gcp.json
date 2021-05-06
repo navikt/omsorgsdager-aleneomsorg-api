@@ -12,8 +12,7 @@
   ],
   "externalHosts": [
     "oauth2.googleapis.com",
-    "login.microsoftonline.com",
-    "https://unleash.nais.io/"
+    "login.microsoftonline.com"
   ],
   "env": {
     "REDIS_HOST": "omsorgsdager-aleneomsorg-api-redis",

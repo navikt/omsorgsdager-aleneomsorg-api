@@ -5,7 +5,6 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.helse.dusseldorf.ktor.unleash.UnleashService
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.felles.SØKNAD_URL
 import no.nav.omsorgsdageraleneomsorgapi.felles.VALIDERING_URL
@@ -25,8 +24,7 @@ fun Route.søknadApis(
     søknadService: SøknadService,
     barnService: BarnService,
     søkerService: SøkerService,
-    idTokenProvider: IdTokenProvider,
-    unleashService: UnleashService
+    idTokenProvider: IdTokenProvider
 ) {
 
     post(SØKNAD_URL) {
@@ -57,7 +55,6 @@ fun Route.søknadApis(
         val søknad = call.receive<Søknad>()
         val idToken = idTokenProvider.getIdToken(call)
         val callId = call.getCallId()
-
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
 
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())

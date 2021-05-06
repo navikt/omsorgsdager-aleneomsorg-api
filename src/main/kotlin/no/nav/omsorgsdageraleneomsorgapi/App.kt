@@ -22,8 +22,6 @@ import no.nav.helse.dusseldorf.ktor.jackson.JacksonStatusPages
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
 import no.nav.helse.dusseldorf.ktor.metrics.init
-import no.nav.helse.dusseldorf.ktor.unleash.UnleashService
-import no.nav.helse.dusseldorf.ktor.unleash.unleashConfigBuilder
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnGateway
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.barn.barnApis
@@ -110,7 +108,6 @@ fun Application.omsorgsdageraleneomsorgapi() {
         val søknadKafkaProducer = SøknadKafkaProducer(kafkaConfig = configuration.getKafkaConfig())
         val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
         val søknadService = SøknadService(kafkaProducer = søknadKafkaProducer)
-        val unleashService = UnleashService(configuration.config.unleashConfigBuilder())
 
         val barnService = BarnService(
             barnGateway = barnGateway,
@@ -152,14 +149,12 @@ fun Application.omsorgsdageraleneomsorgapi() {
                 idTokenProvider = idTokenProvider,
                 barnService = barnService,
                 søkerService = søkerService,
-                søknadService = søknadService,
-                unleashService = unleashService
+                søknadService = søknadService
             )
         }
 
         val healthService = HealthService(
             healthChecks = setOf(
-                unleashService,
                 søknadKafkaProducer,
                 søkerGateway,
                 barnGateway
