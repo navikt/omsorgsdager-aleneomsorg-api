@@ -56,7 +56,6 @@ data class Configuration(val config : ApplicationConfig) {
 
         KafkaConfig(
             bootstrapServers = bootstrapServers,
-            credentials = Pair(config.getRequiredString("nav.kafka.username", secret = false), config.getRequiredString("nav.kafka.password", secret = true)),
             trustStore = trustStore,
             keyStore = keyStore
         )
@@ -64,10 +63,7 @@ data class Configuration(val config : ApplicationConfig) {
 
     internal fun getRedisPort() = config.getRequiredString("nav.redis.port", secret = false).toInt()
     internal fun getRedisHost() = config.getRequiredString("nav.redis.host", secret = false)
-
-    internal fun getStoragePassphrase(): String {
-        return config.getRequiredString("nav.storage.passphrase", secret = true)
-    }
+    internal fun getStoragePassphrase(): String = config.getRequiredString("nav.storage.passphrase", secret = true)
 
     internal fun<K, V>cache(
         expiry: Duration = Duration.ofMinutes(config.getRequiredString("nav.cache.barn.expiry_in_minutes", secret = false).toLong())
