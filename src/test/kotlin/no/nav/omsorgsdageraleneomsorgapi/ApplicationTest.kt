@@ -20,7 +20,6 @@ import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubOppslagHealth
 import org.json.JSONObject
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Ignore
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -219,6 +218,7 @@ class ApplicationTest {
     @Test
     fun `Sende ugyldig søknad til validering`() {
         val ugyldigSøknad = SøknadUtils.gyldigSøknad().copy(
+            barn = listOf(),
             harBekreftetOpplysninger = false,
             harForståttRettigheterOgPlikter = false
         ).somJson()
@@ -245,6 +245,57 @@ class ApplicationTest {
                       "name": "harForståttRettigheterOgPlikter",
                       "reason": "Må ha forstått rettigheter og plikter for å sende inn søknad.",
                       "invalid_value": false
+                    },
+                    {
+                      "type": "entity",
+                      "name": "barn",
+                      "reason": "Listen over barn kan ikke være tom",
+                      "invalid_value": []
+                    }
+                  ]
+                }
+            """.trimIndent(),
+            expectedCode = HttpStatusCode.BadRequest,
+            requestEntity = ugyldigSøknad
+        )
+    }
+
+    @Test
+    fun `Sende ugyldig søknad til innsending`() {
+        val ugyldigSøknad = SøknadUtils.gyldigSøknad().copy(
+            barn = listOf(),
+            harBekreftetOpplysninger = false,
+            harForståttRettigheterOgPlikter = false
+        ).somJson()
+
+        requestAndAssert(
+            httpMethod = HttpMethod.Post,
+            path = SØKNAD_URL,
+            expectedResponse = """
+                {
+                  "type": "/problem-details/invalid-request-parameters",
+                  "title": "invalid-request-parameters",
+                  "status": 400,
+                  "detail": "Requesten inneholder ugyldige paramtere.",
+                  "instance": "about:blank",
+                  "invalid_parameters": [
+                    {
+                      "type": "entity",
+                      "name": "harBekreftetOpplysninger",
+                      "reason": "Opplysningene må bekreftes for å sende inn søknad.",
+                      "invalid_value": false
+                    },
+                    {
+                      "type": "entity",
+                      "name": "harForståttRettigheterOgPlikter",
+                      "reason": "Må ha forstått rettigheter og plikter for å sende inn søknad.",
+                      "invalid_value": false
+                    },
+                    {
+                      "type": "entity",
+                      "name": "barn",
+                      "reason": "Listen over barn kan ikke være tom",
+                      "invalid_value": []
                     }
                   ]
                 }

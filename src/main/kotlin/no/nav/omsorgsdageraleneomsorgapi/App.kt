@@ -107,11 +107,16 @@ fun Application.omsorgsdageraleneomsorgapi() {
         val søkerService = SøkerService(søkerGateway = søkerGateway)
         val søknadKafkaProducer = SøknadKafkaProducer(kafkaConfig = configuration.getKafkaConfig())
         val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
-        val søknadService = SøknadService(kafkaProducer = søknadKafkaProducer)
 
         val barnService = BarnService(
             barnGateway = barnGateway,
             cache = configuration.cache()
+        )
+
+        val søknadService = SøknadService(
+            kafkaProducer = søknadKafkaProducer,
+            søkerService = søkerService,
+            barnService = barnService
         )
 
         environment.monitor.subscribe(ApplicationStopping) {
@@ -148,7 +153,6 @@ fun Application.omsorgsdageraleneomsorgapi() {
             søknadApis(
                 idTokenProvider = idTokenProvider,
                 barnService = barnService,
-                søkerService = søkerService,
                 søknadService = søknadService
             )
         }
