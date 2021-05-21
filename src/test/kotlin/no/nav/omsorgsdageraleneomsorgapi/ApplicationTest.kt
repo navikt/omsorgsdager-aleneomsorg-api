@@ -323,6 +323,8 @@ class ApplicationTest {
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
+    // TODO: 21/05/2021 Må lage test som sjekker at det blir sendt ut to meldinger dersom søknaden inneholder to barn. 
+
     @Test
     fun `Sende søknad hvor søker ikke er myndig`() {
         val cookie = getAuthCookie(ikkeMyndigFnr)
