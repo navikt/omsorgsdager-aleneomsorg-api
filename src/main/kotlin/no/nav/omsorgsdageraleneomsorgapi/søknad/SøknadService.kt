@@ -34,7 +34,7 @@ class SøknadService(
 
         if (søknad.barn.size > 1) {
             val søknader = søknad.splittTilKomplettSøknadPerBarn(søker)
-            LOGGER.info("Søknad splittet opp i ${søknader.size}. SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
+            LOGGER.info("SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
 
             søknader.forEach {
                 kafkaProducer.produserKafkamelding(søknad = it, metadata = metadata)
@@ -49,5 +49,8 @@ class SøknadService(
 fun Søknad.splittTilKomplettSøknadPerBarn(søker: Søker): List<KomplettSøknad> {
     return this.barn.mapIndexed { index, barn ->
         this.tilKomplettSøknad(søker).copy(barn = listOf(barn), søknadId = søknadId+"-${index+1}")
+    // TODO: 21/05/2021 Er det best å legge på -X på original uuid, eller burde man generere helt ny uuid?
+    //  Kan noe feile fordi den er 2 tegn lengre? Vi har uansett correlationId for å følge, samt logger hva de blir spilttet ut til.
+    // Fordelen med å legge på postfix er at det er enklere å teste fordi da kjenner man til søknadId.
     }
 }
