@@ -59,10 +59,11 @@ class ApplicationTest {
             val fileConfig = ConfigFactory.load()
             val testConfig = ConfigFactory.parseMap(
                 TestConfiguration.asMap(
-                kafkaEnvironment = kafkaEnvironment,
-                wireMockServer = wireMockServer,
-                redisServer = redisServer
-            ))
+                    kafkaEnvironment = kafkaEnvironment,
+                    wireMockServer = wireMockServer,
+                    redisServer = redisServer
+                )
+            )
             val mergedConfig = testConfig.withFallback(fileConfig)
 
             return HoconApplicationConfig(mergedConfig)
@@ -150,7 +151,7 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Hente barn og sjekk eksplisit at identitetsnummer ikke blir med ved get kall`(){
+    fun `Hente barn og sjekk eksplisit at identitetsnummer ikke blir med ved get kall`() {
 
         val respons = requestAndAssert(
             httpMethod = HttpMethod.Get,
@@ -203,7 +204,7 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Sende gyldig melding til validering`(){
+    fun `Sende gyldig melding til validering`() {
         val søknad = SøknadUtils.gyldigSøknad().somJson()
 
         requestAndAssert(
@@ -376,8 +377,12 @@ class ApplicationTest {
         return respons
     }
 
-    private fun hentSøknadSendtTilProsessering(soknadId: String): JSONObject {
-        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMD_ALENEOMSORG).data
+    private fun hentSøknadSendtTilProsessering(soknadId: String, forventetAntall: Int = 1): JSONObject {
+        return kafkaTestConsumer.hentSøknad(
+            soknadId,
+            topic = Topics.MOTTATT_OMD_ALENEOMSORG,
+            forventetAntall = forventetAntall
+        ).data
     }
 
     private fun verifiserAtInnholdetErLikt(
@@ -387,9 +392,10 @@ class ApplicationTest {
         assertTrue(søknadPlukketFraTopic.has("søker"))
         søknadPlukketFraTopic.remove("søker") //Fjerner søker siden det settes i komplettSøknad
 
-        søknadPlukketFraTopic.remove("k9Format") //Fjerner k9Format
+        søknadPlukketFraTopic.remove("barn")
+        søknadSendtInn.remove("barn")
 
-        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic,  true)
+        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic, true)
 
         logger.info("Verifisering OK")
     }

@@ -73,3 +73,4 @@ enum class TidspunktForAleneomsorg {
     SISTE_2_ÅRENE,
     TIDLIGERE
 }
+

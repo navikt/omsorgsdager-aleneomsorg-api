@@ -56,7 +56,8 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
 internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
     søknadId: String,
     maxWaitInSeconds: Long = 20,
-    topic: String
+    topic: String,
+    forventetAntall: Int
 ) : TopicEntry<JSONObject> {
     val end = System.currentTimeMillis() + Duration.ofSeconds(maxWaitInSeconds).toMillis()
     while (System.currentTimeMillis() < end) {
@@ -66,7 +67,7 @@ internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
             .filter { it.key() == søknadId }
 
         if (entries.isNotEmpty()) {
-            assertEquals(1, entries.size)
+            assertEquals(forventetAntall, entries.size)
             return entries.first().value()
         }
     }

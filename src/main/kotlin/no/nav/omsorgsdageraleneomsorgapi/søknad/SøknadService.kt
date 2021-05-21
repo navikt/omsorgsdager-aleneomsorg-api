@@ -28,11 +28,26 @@ class SøknadService(
 
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idToken, callId)
         søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
-        søknad.valider()
 
+        søknad.valider()
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
-        kafkaProducer.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+        if (søknad.barn.size > 1) {
+            val søknader = søknad.splittTilKomplettSøknadPerBarn(søker)
+            LOGGER.info("Søknad splittet opp i ${søknader.size}. SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
+
+            søknader.forEach {
+                kafkaProducer.produserKafkamelding(søknad = it, metadata = metadata)
+            }
+        } else {
+            kafkaProducer.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+        }
     }
 
+}
+
+fun Søknad.splittTilKomplettSøknadPerBarn(søker: Søker): List<KomplettSøknad> {
+    return this.barn.mapIndexed { index, barn ->
+        this.tilKomplettSøknad(søker).copy(barn = listOf(barn), søknadId = søknadId+"-${index+1}")
+    }
 }
