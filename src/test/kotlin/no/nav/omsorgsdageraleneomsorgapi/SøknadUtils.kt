@@ -3,6 +3,7 @@ package no.nav.omsorgsdageraleneomsorgapi
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Søknad
+import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
 import java.time.LocalDate
 
 object SøknadUtils {
@@ -24,7 +25,8 @@ object SøknadUtils {
                 navn = "Ole Dole",
                 identitetsnummer = "25058118020",
                 aktørId = null,
-                aleneomsorg = true
+                tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
+                dato = LocalDate.parse("2021-01-01")
             )
         ),
         harBekreftetOpplysninger = true,

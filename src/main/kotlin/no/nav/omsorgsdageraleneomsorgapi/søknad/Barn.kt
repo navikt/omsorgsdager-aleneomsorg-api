@@ -3,12 +3,14 @@ package no.nav.omsorgsdageraleneomsorgapi.søknad
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
 import no.nav.omsorgsdageraleneomsorgapi.felles.gyldigNorskIdentifikator
+import java.time.LocalDate
 
 data class Barn (
     val navn: String,
     val aktørId: String?,
     var identitetsnummer: String?,
-    val aleneomsorg: Boolean? = null
+    val tidspunktForAleneomsorg: TidspunktForAleneomsorg,
+    val dato: LocalDate? = null
 ) {
     fun manglerIdentitetsnummer(): Boolean = identitetsnummer.isNullOrEmpty()
 
@@ -18,17 +20,6 @@ data class Barn (
 
     fun valider(index: Int): MutableSet<Violation> {
         val mangler: MutableSet<Violation> = mutableSetOf()
-
-        if(aleneomsorg er null){
-            mangler.add(
-                Violation(
-                    parameterName = "barn[$index].aleneomsorg",
-                    parameterType = ParameterType.ENTITY,
-                    reason = "Barn.aleneomsorg kan ikke være null",
-                    invalidValue = aleneomsorg
-                )
-            )
-        }
 
         if(identitetsnummer == null){
             mangler.add(
@@ -63,6 +54,22 @@ data class Barn (
             )
         }
 
+        if(tidspunktForAleneomsorg == TidspunktForAleneomsorg.SISTE_2_ÅRENE && dato == null){
+            mangler.add(
+                Violation(
+                    parameterName = "barn[$index].dato",
+                    parameterType = ParameterType.ENTITY,
+                    reason = "Barn.dato kan ikke være tom dersom tidspunktForAleneomsorg er ${TidspunktForAleneomsorg.SISTE_2_ÅRENE.name}",
+                    invalidValue = dato
+                )
+            )
+        }
+
         return mangler
     }
+}
+
+enum class TidspunktForAleneomsorg {
+    SISTE_2_ÅRENE,
+    TIDLIGERE
 }
