@@ -31,11 +31,18 @@ class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
         OMD_ALENEOMSORG_MOTTATT_TOPIC.valueSerializer
     )
 
+    internal fun beginTransaction() = producer.beginTransaction()
+    internal fun abortTransaction() = producer.abortTransaction()
+    internal fun commitTransaction() = producer.commitTransaction()
+    internal fun close() = producer.close()
+    internal fun init() = producer.initTransactions()
+
     internal fun produserKafkamelding(
         søknad: KomplettSøknad,
         metadata: Metadata
     ) {
         if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad med versjon ${metadata.version} til prosessering.")
+
         val recordMetaData = producer.send(
             ProducerRecord(
                 OMD_ALENEOMSORG_MOTTATT_TOPIC.name,
@@ -49,8 +56,6 @@ class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
 
         logger.info(formaterStatuslogging(søknad.søknadId, "sendes til topic ${OMD_ALENEOMSORG_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
     }
-
-    internal fun stop() = producer.close()
 
     override suspend fun check(): Result {
         return try {

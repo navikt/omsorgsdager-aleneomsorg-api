@@ -107,6 +107,8 @@ fun Application.omsorgsdageraleneomsorgapi() {
         val søkerService = SøkerService(søkerGateway = søkerGateway)
         val søknadKafkaProducer = SøknadKafkaProducer(kafkaConfig = configuration.getKafkaConfig())
         val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
+        
+        søknadKafkaProducer.init() // TODO: 25/05/2021 Riktig? https://chrzaszcz.dev/2019/12/kafka-transactions/ " If you want to use transactions, you have to initialize some things upfront. This should be called once in the lifetime of your producer. "
 
         val barnService = BarnService(
             barnGateway = barnGateway,
@@ -114,14 +116,14 @@ fun Application.omsorgsdageraleneomsorgapi() {
         )
 
         val søknadService = SøknadService(
-            kafkaProducer = søknadKafkaProducer,
+            kafkaProdusent = søknadKafkaProducer,
             søkerService = søkerService,
             barnService = barnService
         )
 
         environment.monitor.subscribe(ApplicationStopping) {
             logger.info("Stopper Kafka Producer.")
-            søknadKafkaProducer.stop()
+            søknadKafkaProducer.close()
             logger.info("Kafka Producer Stoppet.")
         }
 

@@ -9,13 +9,17 @@ import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
+import org.apache.kafka.common.errors.AuthorizationException
+import org.apache.kafka.common.errors.OutOfOrderSequenceException
+import org.apache.kafka.common.errors.ProducerFencedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 
 private val LOGGER: Logger = LoggerFactory.getLogger(SøknadService::class.java)
 
 class SøknadService(
-    val kafkaProducer: SøknadKafkaProducer,
+    val kafkaProdusent: SøknadKafkaProducer,
     val barnService: BarnService,
     val søkerService: SøkerService
 ) {
@@ -33,24 +37,30 @@ class SøknadService(
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
         if (søknad.barn.size > 1) {
-            val søknader = søknad.splittTilKomplettSøknadPerBarn(søker)
+            val søknader = søknad.splittTilSøknadPerBarn()
             LOGGER.info("SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
-
-            søknader.forEach {
-                kafkaProducer.produserKafkamelding(søknad = it, metadata = metadata)
+            try {
+                kafkaProdusent.beginTransaction()
+                søknader.forEach { kafkaProdusent.produserKafkamelding(søknad = it.tilKomplettSøknad(søker), metadata = metadata) }
+                kafkaProdusent.commitTransaction()
+            } catch (e: Exception) {
+                LOGGER.error("Feilet ved produsering av kafkamelding")
+                when (e) {
+                    is ProducerFencedException, is OutOfOrderSequenceException, is AuthorizationException -> {
+                        // We can't recover from these exceptions, so our only option is to close the producer and exit.
+                        kafkaProdusent.close()
+                    }
+                    else -> kafkaProdusent.abortTransaction()
+                }
+                throw e
             }
         } else {
-            kafkaProducer.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+            kafkaProdusent.beginTransaction()
+            kafkaProdusent.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+            kafkaProdusent.commitTransaction()
         }
     }
 
 }
 
-fun Søknad.splittTilKomplettSøknadPerBarn(søker: Søker): List<KomplettSøknad> {
-    return this.barn.mapIndexed { index, barn ->
-        this.tilKomplettSøknad(søker).copy(barn = listOf(barn), søknadId = søknadId+"-${index+1}")
-    // TODO: 21/05/2021 Er det best å legge på -X på original uuid, eller burde man generere helt ny uuid?
-    //  Kan noe feile fordi den er 2 tegn lengre? Vi har uansett correlationId for å følge, samt logger hva de blir spilttet ut til.
-    // Fordelen med å legge på postfix er at det er enklere å teste fordi da kjenner man til søknadId.
-    }
-}
+fun Søknad.splittTilSøknadPerBarn() = this.barn.map { this.copy(barn = listOf(it), søknadId = UUID.randomUUID().toString()) }

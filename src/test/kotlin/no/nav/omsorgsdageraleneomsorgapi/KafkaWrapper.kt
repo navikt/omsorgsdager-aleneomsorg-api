@@ -54,24 +54,44 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
 }
 
 internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
-    søknadId: String,
+    correlationId: String,
     maxWaitInSeconds: Long = 20,
     topic: String,
-    forventetAntall: Int
 ) : TopicEntry<JSONObject> {
     val end = System.currentTimeMillis() + Duration.ofSeconds(maxWaitInSeconds).toMillis()
     while (System.currentTimeMillis() < end) {
         seekToBeginning(assignment())
         val entries = poll(Duration.ofSeconds(1))
             .records(topic)
-            .filter { it.key() == søknadId }
+            .filter { it.value().metadata.correlationId == correlationId }
 
         if (entries.isNotEmpty()) {
-            assertEquals(forventetAntall, entries.size)
+            assertEquals(1, entries.size)
             return entries.first().value()
         }
     }
-    throw IllegalStateException("Fant ikke opprettet oppgave for søknad $søknadId etter $maxWaitInSeconds sekunder.")
+    throw IllegalStateException("Fant ikke opprettet oppgave for søknad $correlationId etter $maxWaitInSeconds sekunder.")
+}
+
+internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentFlereSøknader(
+    correlationId: String,
+    maxWaitInSeconds: Long = 20,
+    topic: String,
+    forventetAntall: Int
+) : List<JSONObject> {
+    val end = System.currentTimeMillis() + Duration.ofSeconds(maxWaitInSeconds).toMillis()
+    while (System.currentTimeMillis() < end) {
+        seekToBeginning(assignment())
+        val entries = poll(Duration.ofSeconds(1))
+            .records(topic)
+            .filter { it.value().metadata.correlationId == correlationId }
+
+        if (entries.isNotEmpty()) {
+            assertEquals(forventetAntall, entries.size)
+            return entries.map { it.value().data }
+        }
+    }
+    throw IllegalStateException("Fant ikke opprettet oppgave for søknad $correlationId etter $maxWaitInSeconds sekunder.")
 }
 
 private class SoknadV1OutgoingDeserialiser : Deserializer<TopicEntry<JSONObject>> {

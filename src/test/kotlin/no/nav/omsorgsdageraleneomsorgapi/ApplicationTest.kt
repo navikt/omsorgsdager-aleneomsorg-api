@@ -4,6 +4,7 @@ import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.http.Cookie
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
@@ -13,6 +14,8 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.omsorgsdageraleneomsorgapi.felles.*
 import no.nav.omsorgsdageraleneomsorgapi.kafka.Topics
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.started
+import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
+import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.omsorgsdagerAleneomsorgApi
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagSoker
@@ -23,7 +26,7 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -178,7 +181,7 @@ class ApplicationTest {
                   ]
                 }
             """.trimIndent()
-        )
+        ).content
 
         val responsSomJSONArray = JSONObject(respons).getJSONArray("barnOppslag")
 
@@ -308,22 +311,54 @@ class ApplicationTest {
 
     @Test
     fun `Sende gyldig søknad og plukke opp fra kafka topic`() {
-        val søknadID = UUID.randomUUID().toString()
-        val søknad = SøknadUtils.gyldigSøknad().copy(søknadId = søknadID).somJson()
+        val søknad = SøknadUtils.gyldigSøknad().somJson()
 
-        requestAndAssert(
+        val correlationId = requestAndAssert(
             httpMethod = HttpMethod.Post,
             path = SØKNAD_URL,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
-        )
+        ).call.callId!!
 
-        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(søknadID)
+        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(correlationId)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
-    // TODO: 21/05/2021 Må lage test som sjekker at det blir sendt ut to meldinger dersom søknaden inneholder to barn. 
+    @Test
+    fun `Sende gyldig søknad med to barn, forvent at det blir plukket opp to meldinger fra topicen`() {
+        val søknad = SøknadUtils.gyldigSøknad().copy(
+            barn = listOf(
+                Barn(
+                    navn = "Ole",
+                    identitetsnummer = "25058118020",
+                    aktørId = null,
+                    tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
+                    dato = LocalDate.parse("2021-01-01")
+                ),
+                Barn(
+                    navn = "Doffen",
+                    identitetsnummer = "03127900263",
+                    aktørId = null,
+                    tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
+                    dato = LocalDate.parse("2021-01-01")
+                )
+            )
+        )
+
+        val correlationId = requestAndAssert(
+            httpMethod = HttpMethod.Post,
+            path = SØKNAD_URL,
+            expectedResponse = null,
+            expectedCode = HttpStatusCode.Accepted,
+            requestEntity = søknad.somJson()
+        ).call.callId!!
+
+        logger.info("CorrelationID: $correlationId")
+        val søknaderHentetFraProsessering = hentFlereSøknadSendtTilProsessering(correlationId, forventetAntall = 2)
+
+        assertTrue(søknaderHentetFraProsessering.size == 2)
+    }
 
     @Test
     fun `Sende søknad hvor søker ikke er myndig`() {
@@ -355,8 +390,8 @@ class ApplicationTest {
         expectedCode: HttpStatusCode,
         leggTilCookie: Boolean = true,
         cookie: Cookie = getAuthCookie(gyldigFodselsnummerA)
-    ): String? {
-        val respons: String?
+    ): TestApplicationResponse {
+        val testApplicationResponse: TestApplicationResponse
         with(engine) {
             handleRequest(httpMethod, path) {
                 if (leggTilCookie) addHeader(HttpHeaders.Cookie, cookie.toString())
@@ -365,9 +400,9 @@ class ApplicationTest {
                 if (requestEntity != null) addHeader(HttpHeaders.ContentType, "application/json")
                 if (requestEntity != null) setBody(requestEntity)
             }.apply {
+                testApplicationResponse = response
                 logger.info("Response Entity = ${response.content}")
                 logger.info("Expected Entity = $expectedResponse")
-                respons = response.content
                 assertEquals(expectedCode, response.status())
                 if (expectedResponse != null) {
                     JSONAssert.assertEquals(expectedResponse, response.content!!, true)
@@ -376,16 +411,20 @@ class ApplicationTest {
                 }
             }
         }
-        return respons
+        return testApplicationResponse
     }
 
-    private fun hentSøknadSendtTilProsessering(soknadId: String, forventetAntall: Int = 1): JSONObject {
-        return kafkaTestConsumer.hentSøknad(
-            soknadId,
-            topic = Topics.MOTTATT_OMD_ALENEOMSORG,
-            forventetAntall = forventetAntall
-        ).data
-    }
+    private fun hentSøknadSendtTilProsessering(correlationId: String) = kafkaTestConsumer.hentSøknad(
+        correlationId = correlationId,
+        topic = Topics.MOTTATT_OMD_ALENEOMSORG
+    ).data
+
+    private fun hentFlereSøknadSendtTilProsessering(correlationId: String, forventetAntall: Int) = kafkaTestConsumer.hentFlereSøknader(
+        correlationId = correlationId,
+        topic = Topics.MOTTATT_OMD_ALENEOMSORG,
+        forventetAntall = forventetAntall
+    )
+
 
     private fun verifiserAtInnholdetErLikt(
         søknadSendtInn: JSONObject,
