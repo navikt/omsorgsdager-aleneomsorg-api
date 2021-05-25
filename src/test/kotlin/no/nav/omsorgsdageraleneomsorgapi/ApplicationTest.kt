@@ -154,6 +154,28 @@ class ApplicationTest {
     }
 
     @Test
+    fun `Sende søknad hvor søker ikke er myndig`() {
+        val cookie = getAuthCookie(ikkeMyndigFnr)
+
+        requestAndAssert(
+            httpMethod = HttpMethod.Post,
+            path = SØKNAD_URL,
+            expectedResponse = """
+                {
+                    "type": "/problem-details/unauthorized",
+                    "title": "unauthorized",
+                    "status": 403,
+                    "detail": "Søkeren er ikke myndig og kan ikke sende inn søknaden.",
+                    "instance": "about:blank"
+                }
+            """.trimIndent(),
+            expectedCode = HttpStatusCode.Forbidden,
+            cookie = cookie,
+            requestEntity = SøknadUtils.gyldigSøknad().somJson()
+        )
+    }
+
+    @Test
     fun `Hente barn og sjekk eksplisit at identitetsnummer ikke blir med ved get kall`() {
 
         val respons = requestAndAssert(
@@ -360,27 +382,7 @@ class ApplicationTest {
         assertTrue(søknaderHentetFraProsessering.size == 2)
     }
 
-    @Test
-    fun `Sende søknad hvor søker ikke er myndig`() {
-        val cookie = getAuthCookie(ikkeMyndigFnr)
-
-        requestAndAssert(
-            httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
-            expectedResponse = """
-                {
-                    "type": "/problem-details/unauthorized",
-                    "title": "unauthorized",
-                    "status": 403,
-                    "detail": "Søkeren er ikke myndig og kan ikke sende inn søknaden.",
-                    "instance": "about:blank"
-                }
-            """.trimIndent(),
-            expectedCode = HttpStatusCode.Forbidden,
-            cookie = cookie,
-            requestEntity = SøknadUtils.gyldigSøknad().somJson()
-        )
-    }
+    // TODO: 25/05/2021 Test som sjekker at dersom noe går galt ved kafkaprodusering så sendes ikke noe
 
     private fun requestAndAssert(
         httpMethod: HttpMethod,
