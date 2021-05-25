@@ -9,9 +9,6 @@ import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
-import org.apache.kafka.common.errors.AuthorizationException
-import org.apache.kafka.common.errors.OutOfOrderSequenceException
-import org.apache.kafka.common.errors.ProducerFencedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -45,13 +42,7 @@ class SøknadService(
                 kafkaProdusent.commitTransaction()
             } catch (e: Exception) {
                 LOGGER.error("Feilet ved produsering av kafkamelding")
-                when (e) {
-                    is ProducerFencedException, is OutOfOrderSequenceException, is AuthorizationException -> {
-                        // We can't recover from these exceptions, so our only option is to close the producer and exit.
-                        kafkaProdusent.close()
-                    }
-                    else -> kafkaProdusent.abortTransaction()
-                }
+                kafkaProdusent.abortTransaction()
                 throw e
             }
         } else {
