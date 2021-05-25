@@ -56,7 +56,7 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
 internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
     correlationId: String,
     maxWaitInSeconds: Long = 20,
-    topic: String,
+    topic: String
 ) : TopicEntry<JSONObject> {
     val end = System.currentTimeMillis() + Duration.ofSeconds(maxWaitInSeconds).toMillis()
     while (System.currentTimeMillis() < end) {

@@ -31,11 +31,14 @@ class SøknadKafkaProdusent(val kafkaConfig: KafkaConfig) : HealthCheck {
         OMD_ALENEOMSORG_MOTTATT_TOPIC.valueSerializer
     )
 
+    init {
+        produsent.initTransactions()
+    }
+
     internal fun beginTransaction() = produsent.beginTransaction()
     internal fun abortTransaction() = produsent.abortTransaction()
     internal fun commitTransaction() = produsent.commitTransaction()
     internal fun close() = produsent.close()
-    internal fun init() = produsent.initTransactions()
 
     internal fun produserKafkamelding(
         søknad: KomplettSøknad,

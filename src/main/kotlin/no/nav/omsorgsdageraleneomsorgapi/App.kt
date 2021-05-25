@@ -107,8 +107,6 @@ fun Application.omsorgsdageraleneomsorgapi() {
         val søkerService = SøkerService(søkerGateway = søkerGateway)
         val søknadKafkaProduser = SøknadKafkaProdusent(kafkaConfig = configuration.getKafkaConfig())
         val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
-        
-        søknadKafkaProduser.init() // TODO: 25/05/2021 Riktig? https://chrzaszcz.dev/2019/12/kafka-transactions/ " If you want to use transactions, you have to initialize some things upfront. This should be called once in the lifetime of your producer. "
 
         val barnService = BarnService(
             barnGateway = barnGateway,
