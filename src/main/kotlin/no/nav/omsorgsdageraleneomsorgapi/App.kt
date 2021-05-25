@@ -27,7 +27,7 @@ import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.barn.barnApis
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdTokenStatusPages
-import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProducer
+import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.MellomlagringService
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.mellomlagringApis
 import no.nav.omsorgsdageraleneomsorgapi.redis.RedisConfig
@@ -105,10 +105,10 @@ fun Application.omsorgsdageraleneomsorgapi() {
 
         val søkerGateway = SøkerGateway(baseUrl = configuration.getK9OppslagUrl())
         val søkerService = SøkerService(søkerGateway = søkerGateway)
-        val søknadKafkaProducer = SøknadKafkaProducer(kafkaConfig = configuration.getKafkaConfig())
+        val søknadKafkaProduser = SøknadKafkaProdusent(kafkaConfig = configuration.getKafkaConfig())
         val barnGateway = BarnGateway(baseUrl = configuration.getK9OppslagUrl())
         
-        søknadKafkaProducer.init() // TODO: 25/05/2021 Riktig? https://chrzaszcz.dev/2019/12/kafka-transactions/ " If you want to use transactions, you have to initialize some things upfront. This should be called once in the lifetime of your producer. "
+        søknadKafkaProduser.init() // TODO: 25/05/2021 Riktig? https://chrzaszcz.dev/2019/12/kafka-transactions/ " If you want to use transactions, you have to initialize some things upfront. This should be called once in the lifetime of your producer. "
 
         val barnService = BarnService(
             barnGateway = barnGateway,
@@ -116,14 +116,14 @@ fun Application.omsorgsdageraleneomsorgapi() {
         )
 
         val søknadService = SøknadService(
-            kafkaProdusent = søknadKafkaProducer,
+            kafkaProdusent = søknadKafkaProduser,
             søkerService = søkerService,
             barnService = barnService
         )
 
         environment.monitor.subscribe(ApplicationStopping) {
             logger.info("Stopper Kafka Producer.")
-            søknadKafkaProducer.close()
+            søknadKafkaProduser.close()
             logger.info("Kafka Producer Stoppet.")
         }
 
@@ -161,7 +161,7 @@ fun Application.omsorgsdageraleneomsorgapi() {
 
         val healthService = HealthService(
             healthChecks = setOf(
-                søknadKafkaProducer,
+                søknadKafkaProduser,
                 søkerGateway,
                 barnGateway
             )

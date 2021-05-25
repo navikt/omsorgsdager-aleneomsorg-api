@@ -5,7 +5,7 @@ import no.nav.omsorgsdageraleneomsorgapi.felles.Metadata
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
-import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProducer
+import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
@@ -19,7 +19,7 @@ import java.util.*
 private val LOGGER: Logger = LoggerFactory.getLogger(SøknadService::class.java)
 
 class SøknadService(
-    val kafkaProdusent: SøknadKafkaProducer,
+    val kafkaProdusent: SøknadKafkaProdusent,
     val barnService: BarnService,
     val søkerService: SøkerService
 ) {

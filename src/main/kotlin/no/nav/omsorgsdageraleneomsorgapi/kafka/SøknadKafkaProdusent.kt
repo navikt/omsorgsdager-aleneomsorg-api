@@ -14,28 +14,28 @@ import org.apache.kafka.common.serialization.Serializer
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
+class SøknadKafkaProdusent(val kafkaConfig: KafkaConfig) : HealthCheck {
     private companion object {
-        private val NAME = "SøknadProducer"
+        private val NAME = "SøknadProdusent"
         private val OMD_ALENEOMSORG_MOTTATT_TOPIC = TopicUse(
             name = Topics.MOTTATT_OMD_ALENEOMSORG,
             valueSerializer = SøknadSerializer()
         )
 
-        private val logger = LoggerFactory.getLogger(SøknadKafkaProducer::class.java)
+        private val logger = LoggerFactory.getLogger(SøknadKafkaProdusent::class.java)
     }
 
-    private val producer = KafkaProducer<String, TopicEntry<JSONObject>>(
+    private val produsent = KafkaProducer<String, TopicEntry<JSONObject>>(
         kafkaConfig.producer(NAME),
         OMD_ALENEOMSORG_MOTTATT_TOPIC.keySerializer(),
         OMD_ALENEOMSORG_MOTTATT_TOPIC.valueSerializer
     )
 
-    internal fun beginTransaction() = producer.beginTransaction()
-    internal fun abortTransaction() = producer.abortTransaction()
-    internal fun commitTransaction() = producer.commitTransaction()
-    internal fun close() = producer.close()
-    internal fun init() = producer.initTransactions()
+    internal fun beginTransaction() = produsent.beginTransaction()
+    internal fun abortTransaction() = produsent.abortTransaction()
+    internal fun commitTransaction() = produsent.commitTransaction()
+    internal fun close() = produsent.close()
+    internal fun init() = produsent.initTransactions()
 
     internal fun produserKafkamelding(
         søknad: KomplettSøknad,
@@ -43,7 +43,7 @@ class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
     ) {
         if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad med versjon ${metadata.version} til prosessering.")
 
-        val recordMetaData = producer.send(
+        val recordMetaData = produsent.send(
             ProducerRecord(
                 OMD_ALENEOMSORG_MOTTATT_TOPIC.name,
                 søknad.søknadId,
@@ -59,7 +59,7 @@ class SøknadKafkaProducer(val kafkaConfig: KafkaConfig) : HealthCheck {
 
     override suspend fun check(): Result {
         return try {
-            producer.partitionsFor(OMD_ALENEOMSORG_MOTTATT_TOPIC.name)
+            produsent.partitionsFor(OMD_ALENEOMSORG_MOTTATT_TOPIC.name)
             Healthy(NAME, "Tilkobling til Kafka OK!")
         } catch (cause: Throwable) {
             logger.error("Feil ved tilkobling til Kafka", cause)
