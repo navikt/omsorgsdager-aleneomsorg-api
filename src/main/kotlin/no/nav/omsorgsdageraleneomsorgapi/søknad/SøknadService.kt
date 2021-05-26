@@ -33,12 +33,14 @@ class SøknadService(
 
         søknad.valider()
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
-        søknad.tilK9Format(søker).valider()
-        LOGGER.info(formaterStatuslogging(søknad.søknadId, "K9Format validert OK"))
 
         if (søknad.barn.size > 1) {
             val søknader = søknad.splittTilSøknadPerBarn()
             LOGGER.info("SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
+
+            søknader.forEach { it.tilK9Format(søker).valider() }
+            LOGGER.info(formaterStatuslogging(søknad.søknadId, "K9Format validert OK"))
+
             try {
                 kafkaProdusent.beginTransaction()
                 søknader.forEach { kafkaProdusent.produserKafkamelding(søknad = it.tilKomplettSøknad(søker), metadata = metadata) }
@@ -49,6 +51,9 @@ class SøknadService(
                 throw e
             }
         } else {
+            søknad.tilK9Format(søker).valider()
+            LOGGER.info(formaterStatuslogging(søknad.søknadId, "K9Format validert OK"))
+
             kafkaProdusent.beginTransaction()
             kafkaProdusent.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
             kafkaProdusent.commitTransaction()
