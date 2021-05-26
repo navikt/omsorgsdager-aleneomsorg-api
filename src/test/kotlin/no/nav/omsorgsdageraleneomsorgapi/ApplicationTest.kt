@@ -4,6 +4,7 @@ import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.http.Cookie
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
@@ -13,6 +14,8 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.omsorgsdageraleneomsorgapi.felles.*
 import no.nav.omsorgsdageraleneomsorgapi.kafka.Topics
 import no.nav.omsorgsdageraleneomsorgapi.mellomlagring.started
+import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
+import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.omsorgsdagerAleneomsorgApi
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagSoker
@@ -23,7 +26,7 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -59,10 +62,11 @@ class ApplicationTest {
             val fileConfig = ConfigFactory.load()
             val testConfig = ConfigFactory.parseMap(
                 TestConfiguration.asMap(
-                kafkaEnvironment = kafkaEnvironment,
-                wireMockServer = wireMockServer,
-                redisServer = redisServer
-            ))
+                    kafkaEnvironment = kafkaEnvironment,
+                    wireMockServer = wireMockServer,
+                    redisServer = redisServer
+                )
+            )
             val mergedConfig = testConfig.withFallback(fileConfig)
 
             return HoconApplicationConfig(mergedConfig)
@@ -150,7 +154,29 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Hente barn og sjekk eksplisit at identitetsnummer ikke blir med ved get kall`(){
+    fun `Sende søknad hvor søker ikke er myndig`() {
+        val cookie = getAuthCookie(ikkeMyndigFnr)
+
+        requestAndAssert(
+            httpMethod = HttpMethod.Post,
+            path = SØKNAD_URL,
+            expectedResponse = """
+                {
+                    "type": "/problem-details/unauthorized",
+                    "title": "unauthorized",
+                    "status": 403,
+                    "detail": "Søkeren er ikke myndig og kan ikke sende inn søknaden.",
+                    "instance": "about:blank"
+                }
+            """.trimIndent(),
+            expectedCode = HttpStatusCode.Forbidden,
+            cookie = cookie,
+            requestEntity = SøknadUtils.gyldigSøknad().somJson()
+        )
+    }
+
+    @Test
+    fun `Hente barn og sjekk eksplisit at identitetsnummer ikke blir med ved get kall`() {
 
         val respons = requestAndAssert(
             httpMethod = HttpMethod.Get,
@@ -177,7 +203,7 @@ class ApplicationTest {
                   ]
                 }
             """.trimIndent()
-        )
+        ).content
 
         val responsSomJSONArray = JSONObject(respons).getJSONArray("barnOppslag")
 
@@ -203,7 +229,7 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Sende gyldig melding til validering`(){
+    fun `Sende gyldig melding til validering`() {
         val søknad = SøknadUtils.gyldigSøknad().somJson()
 
         requestAndAssert(
@@ -307,42 +333,56 @@ class ApplicationTest {
 
     @Test
     fun `Sende gyldig søknad og plukke opp fra kafka topic`() {
-        val søknadID = UUID.randomUUID().toString()
-        val søknad = SøknadUtils.gyldigSøknad().copy(søknadId = søknadID).somJson()
+        val søknad = SøknadUtils.gyldigSøknad().somJson()
 
-        requestAndAssert(
+        val correlationId = requestAndAssert(
             httpMethod = HttpMethod.Post,
             path = SØKNAD_URL,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
-        )
+        ).call.callId!!
 
-        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(søknadID)
+        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(correlationId)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
     @Test
-    fun `Sende søknad hvor søker ikke er myndig`() {
-        val cookie = getAuthCookie(ikkeMyndigFnr)
+    fun `Sende gyldig søknad med to barn, forvent at det blir plukket opp to meldinger fra topicen`() {
+        val søknad = SøknadUtils.gyldigSøknad().copy(
+            barn = listOf(
+                Barn(
+                    navn = "Ole",
+                    identitetsnummer = "25058118020",
+                    aktørId = null,
+                    tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
+                    dato = LocalDate.parse("2021-01-01")
+                ),
+                Barn(
+                    navn = "Doffen",
+                    identitetsnummer = "03127900263",
+                    aktørId = null,
+                    tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
+                    dato = LocalDate.parse("2021-01-01")
+                )
+            )
+        )
 
-        requestAndAssert(
+        val correlationId = requestAndAssert(
             httpMethod = HttpMethod.Post,
             path = SØKNAD_URL,
-            expectedResponse = """
-                {
-                    "type": "/problem-details/unauthorized",
-                    "title": "unauthorized",
-                    "status": 403,
-                    "detail": "Søkeren er ikke myndig og kan ikke sende inn søknaden.",
-                    "instance": "about:blank"
-                }
-            """.trimIndent(),
-            expectedCode = HttpStatusCode.Forbidden,
-            cookie = cookie,
-            requestEntity = SøknadUtils.gyldigSøknad().somJson()
-        )
+            expectedResponse = null,
+            expectedCode = HttpStatusCode.Accepted,
+            requestEntity = søknad.somJson()
+        ).call.callId!!
+
+        logger.info("CorrelationID: $correlationId")
+        val søknaderHentetFraProsessering = hentFlereSøknadSendtTilProsessering(correlationId, forventetAntall = 2)
+
+        assertTrue(søknaderHentetFraProsessering.size == 2)
     }
+
+    // TODO: 25/05/2021 Test som sjekker at dersom noe går galt ved kafkaprodusering så sendes ikke noe
 
     private fun requestAndAssert(
         httpMethod: HttpMethod,
@@ -352,8 +392,8 @@ class ApplicationTest {
         expectedCode: HttpStatusCode,
         leggTilCookie: Boolean = true,
         cookie: Cookie = getAuthCookie(gyldigFodselsnummerA)
-    ): String? {
-        val respons: String?
+    ): TestApplicationResponse {
+        val testApplicationResponse: TestApplicationResponse
         with(engine) {
             handleRequest(httpMethod, path) {
                 if (leggTilCookie) addHeader(HttpHeaders.Cookie, cookie.toString())
@@ -362,9 +402,9 @@ class ApplicationTest {
                 if (requestEntity != null) addHeader(HttpHeaders.ContentType, "application/json")
                 if (requestEntity != null) setBody(requestEntity)
             }.apply {
+                testApplicationResponse = response
                 logger.info("Response Entity = ${response.content}")
                 logger.info("Expected Entity = $expectedResponse")
-                respons = response.content
                 assertEquals(expectedCode, response.status())
                 if (expectedResponse != null) {
                     JSONAssert.assertEquals(expectedResponse, response.content!!, true)
@@ -373,12 +413,20 @@ class ApplicationTest {
                 }
             }
         }
-        return respons
+        return testApplicationResponse
     }
 
-    private fun hentSøknadSendtTilProsessering(soknadId: String): JSONObject {
-        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMD_ALENEOMSORG).data
-    }
+    private fun hentSøknadSendtTilProsessering(correlationId: String) = kafkaTestConsumer.hentSøknad(
+        correlationId = correlationId,
+        topic = Topics.MOTTATT_OMD_ALENEOMSORG
+    ).data
+
+    private fun hentFlereSøknadSendtTilProsessering(correlationId: String, forventetAntall: Int) = kafkaTestConsumer.hentFlereSøknader(
+        correlationId = correlationId,
+        topic = Topics.MOTTATT_OMD_ALENEOMSORG,
+        forventetAntall = forventetAntall
+    )
+
 
     private fun verifiserAtInnholdetErLikt(
         søknadSendtInn: JSONObject,
@@ -387,9 +435,10 @@ class ApplicationTest {
         assertTrue(søknadPlukketFraTopic.has("søker"))
         søknadPlukketFraTopic.remove("søker") //Fjerner søker siden det settes i komplettSøknad
 
-        søknadPlukketFraTopic.remove("k9Format") //Fjerner k9Format
+        søknadPlukketFraTopic.remove("barn")
+        søknadSendtInn.remove("barn")
 
-        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic,  true)
+        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic, true)
 
         logger.info("Verifisering OK")
     }

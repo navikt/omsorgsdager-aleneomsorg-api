@@ -5,17 +5,18 @@ import no.nav.omsorgsdageraleneomsorgapi.felles.Metadata
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
-import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProducer
+import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
 import no.nav.omsorgsdageraleneomsorgapi.søker.validate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 
 private val LOGGER: Logger = LoggerFactory.getLogger(SøknadService::class.java)
 
 class SøknadService(
-    val kafkaProducer: SøknadKafkaProducer,
+    val kafkaProdusent: SøknadKafkaProdusent,
     val barnService: BarnService,
     val søkerService: SøkerService
 ) {
@@ -28,11 +29,29 @@ class SøknadService(
 
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idToken, callId)
         søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
-        søknad.valider()
 
+        søknad.valider()
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
-        kafkaProducer.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+        if (søknad.barn.size > 1) {
+            val søknader = søknad.splittTilSøknadPerBarn()
+            LOGGER.info("SøknadId:${søknad.søknadId} splittet ut til ${søknader.map { it.søknadId }}")
+            try {
+                kafkaProdusent.beginTransaction()
+                søknader.forEach { kafkaProdusent.produserKafkamelding(søknad = it.tilKomplettSøknad(søker), metadata = metadata) }
+                kafkaProdusent.commitTransaction()
+            } catch (e: Exception) {
+                LOGGER.error("Feilet ved produsering av kafkamelding")
+                kafkaProdusent.abortTransaction()
+                throw e
+            }
+        } else {
+            kafkaProdusent.beginTransaction()
+            kafkaProdusent.produserKafkamelding(søknad = søknad.tilKomplettSøknad(søker), metadata = metadata)
+            kafkaProdusent.commitTransaction()
+        }
     }
 
 }
+
+fun Søknad.splittTilSøknadPerBarn() = this.barn.map { this.copy(barn = listOf(it), søknadId = UUID.randomUUID().toString()) }
