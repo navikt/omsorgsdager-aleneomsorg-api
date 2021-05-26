@@ -24,6 +24,7 @@ data class Søknad(
         id = id,
         språk = språk,
         barn = barn,
+        k9Søknad = this.tilK9Format(søker),
         harBekreftetOpplysninger = harBekreftetOpplysninger,
         harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter
     )

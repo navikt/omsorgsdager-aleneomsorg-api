@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val dusseldorfKtorVersion = "1.5.3.facbbe4"
 val ktorVersion = ext.get("ktorVersion").toString()
+val k9FormatVersion = "5.1.50"
+
 val mainClass = "no.nav.omsorgsdageraleneomsorgapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
 val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fra kafka-embedded-env
@@ -26,6 +28,10 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfKtorVersion")
 
     implementation("io.ktor:ktor-locations:$ktorVersion")
+
+    //K9-format
+    implementation("no.nav.k9:soknad:$k9FormatVersion")
+    implementation ( "org.glassfish:jakarta.el:3.0.3")
 
     // Client
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")

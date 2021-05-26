@@ -1,5 +1,6 @@
 package no.nav.omsorgsdageraleneomsorgapi.søknad
 
+import no.nav.k9.søknad.Søknad
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import java.time.ZonedDateTime
 
@@ -10,6 +11,7 @@ data class KomplettSøknad(
     val id: String,
     val språk: String,
     val barn: List<Barn>,
+    val k9Søknad: Søknad,
     val harForståttRettigheterOgPlikter: Boolean,
     val harBekreftetOpplysninger: Boolean
 )
