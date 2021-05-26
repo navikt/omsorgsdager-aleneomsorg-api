@@ -30,6 +30,6 @@ private fun Søker.tilK9Søker() : K9Søker = K9Søker(NorskIdentitetsnummer.of(
 
 private fun List<Barn>.tilK9Barn() : K9Barn? {
     val barn = this.getOrNull(0)
-    return if(barn != null) K9Barn(NorskIdentitetsnummer.of(this[0].identitetsnummer))
+    return if(barn != null) K9Barn(NorskIdentitetsnummer.of(barn.identitetsnummer))
     else null
 }
