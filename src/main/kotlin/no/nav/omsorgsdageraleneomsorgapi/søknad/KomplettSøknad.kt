@@ -8,7 +8,6 @@ data class KomplettSøknad(
     val mottatt: ZonedDateTime,
     val søker: Søker,
     val søknadId: String,
-    val id: String,
     val språk: String,
     val barn: List<Barn>,
     val k9Søknad: Søknad,

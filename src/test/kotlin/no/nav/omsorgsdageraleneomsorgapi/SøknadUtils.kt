@@ -20,7 +20,6 @@ object SøknadUtils {
     )
 
     fun gyldigSøknad(mottatt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC)) = Søknad(
-        id = "123456789",
         språk = "nb",
         barn = listOf(
             Barn(

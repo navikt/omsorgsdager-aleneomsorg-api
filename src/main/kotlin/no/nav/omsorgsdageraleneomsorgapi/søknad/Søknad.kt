@@ -10,7 +10,6 @@ import java.util.*
 data class Søknad(
     val søknadId: String = UUID.randomUUID().toString(),
     val mottatt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC),
-    val id: String,
     val språk: String,
     val barn: List<Barn> = listOf(),
     val harForståttRettigheterOgPlikter: Boolean,
@@ -21,7 +20,6 @@ data class Søknad(
         mottatt = mottatt,
         søker = søker,
         søknadId = søknadId,
-        id = id,
         språk = språk,
         barn = barn,
         k9Søknad = this.tilK9Format(søker),
