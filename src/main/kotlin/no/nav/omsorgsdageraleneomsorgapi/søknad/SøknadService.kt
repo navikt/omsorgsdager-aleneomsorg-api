@@ -5,6 +5,7 @@ import no.nav.omsorgsdageraleneomsorgapi.felles.Metadata
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
+import no.nav.omsorgsdageraleneomsorgapi.k9format.tilK9Format
 import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søker.SøkerService
@@ -32,6 +33,8 @@ class SøknadService(
 
         søknad.valider()
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+        søknad.tilK9Format(søker).valider()
+        LOGGER.info(formaterStatuslogging(søknad.søknadId, "K9Format validert OK"))
 
         if (søknad.barn.size > 1) {
             val søknader = søknad.splittTilSøknadPerBarn()

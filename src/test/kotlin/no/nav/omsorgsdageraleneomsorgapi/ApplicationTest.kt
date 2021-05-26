@@ -435,6 +435,9 @@ class ApplicationTest {
         assertTrue(søknadPlukketFraTopic.has("søker"))
         søknadPlukketFraTopic.remove("søker") //Fjerner søker siden det settes i komplettSøknad
 
+        assertTrue(søknadPlukketFraTopic.has("k9Søknad"))
+        søknadPlukketFraTopic.remove("k9Søknad") //Fjerner k9Søknad siden det settes i komplettSøknad
+
         søknadPlukketFraTopic.remove("barn")
         søknadSendtInn.remove("barn")
 

@@ -1,6 +1,7 @@
 package no.nav.omsorgsdageraleneomsorgapi.søknad
 
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnOppslag
+import no.nav.omsorgsdageraleneomsorgapi.k9format.tilK9Format
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import java.time.ZoneOffset
 import java.time.ZonedDateTime

@@ -48,9 +48,10 @@ fun Route.søknadApis(
         val(idToken, callId) = call.hentIdTokenOgCallId(idTokenProvider)
         val barnMedIdentitetsnummer = barnService.hentNåværendeBarn(idToken, callId)
         søknad.oppdaterBarnMedIdentitetsnummer(barnMedIdentitetsnummer)
-        søknad.valider()
 
+        søknad.valider()
         LOGGER.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+
         call.respond(HttpStatusCode.Accepted)
     }
 }

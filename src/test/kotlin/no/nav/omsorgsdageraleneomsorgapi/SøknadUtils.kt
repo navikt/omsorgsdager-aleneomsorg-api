@@ -5,6 +5,8 @@ import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Søknad
 import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
 import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 object SøknadUtils {
 
@@ -17,7 +19,7 @@ object SøknadUtils {
         etternavn = "Doffen"
     )
 
-    fun gyldigSøknad() = Søknad(
+    fun gyldigSøknad(mottatt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC)) = Søknad(
         id = "123456789",
         språk = "nb",
         barn = listOf(
@@ -29,6 +31,7 @@ object SøknadUtils {
                 dato = LocalDate.parse("2021-01-01")
             )
         ),
+        mottatt = mottatt,
         harBekreftetOpplysninger = true,
         harForståttRettigheterOgPlikter = true
     )
