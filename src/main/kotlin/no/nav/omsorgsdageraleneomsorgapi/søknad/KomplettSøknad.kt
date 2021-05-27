@@ -9,7 +9,7 @@ data class KomplettSøknad(
     val søker: Søker,
     val søknadId: String,
     val språk: String,
-    val barn: List<Barn>,
+    val barn: Barn,
     val k9Søknad: Søknad,
     val harForståttRettigheterOgPlikter: Boolean,
     val harBekreftetOpplysninger: Boolean

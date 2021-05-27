@@ -21,7 +21,7 @@ data class Søknad(
         søker = søker,
         søknadId = søknadId,
         språk = språk,
-        barn = barn,
+        barn = this.barn[0], //Etter splitt er det kun et barn i lista.
         k9Søknad = this.tilK9Format(søker),
         harBekreftetOpplysninger = harBekreftetOpplysninger,
         harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter

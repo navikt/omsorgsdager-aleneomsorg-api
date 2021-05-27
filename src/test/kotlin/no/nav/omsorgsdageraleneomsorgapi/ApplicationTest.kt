@@ -380,6 +380,10 @@ class ApplicationTest {
         val søknaderHentetFraProsessering = hentFlereSøknadSendtTilProsessering(correlationId, forventetAntall = 2)
 
         assertTrue(søknaderHentetFraProsessering.size == 2)
+
+        val barnsIdentitetsnummer = søknaderHentetFraProsessering.map { it.getJSONObject("barn").getString("identitetsnummer") }
+        assertTrue(barnsIdentitetsnummer.contains("25058118020"))
+        assertTrue(barnsIdentitetsnummer.contains("03127900263"))
     }
 
     // TODO: 25/05/2021 Test som sjekker at dersom noe går galt ved kafkaprodusering så sendes ikke noe
