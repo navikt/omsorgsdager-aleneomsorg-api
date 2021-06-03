@@ -8,6 +8,8 @@ import no.nav.k9.søknad.ytelse.omsorgspenger.utvidetrett.v1.OmsorgspengerAleneO
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Søknad
+import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
+import java.time.LocalDate
 import no.nav.k9.søknad.Søknad as K9Søknad
 import no.nav.k9.søknad.felles.personopplysninger.Barn as K9Barn
 import no.nav.k9.søknad.felles.personopplysninger.Søker as K9Søker
@@ -20,7 +22,7 @@ fun Søknad.tilK9Format(søker: Søker) : K9Søknad {
         søker.tilK9Søker(),
         OmsorgspengerAleneOmsorg(
             this.barn.tilK9Barn(),
-            Periode(mottatt.toLocalDate(), null),
+            Periode(this.tilPeriodeFraOgMed(), null),
             ""
         )
     )
@@ -33,3 +35,12 @@ private fun List<Barn>.tilK9Barn() : K9Barn? {
     return if(barn != null) K9Barn(NorskIdentitetsnummer.of(barn.identitetsnummer))
     else null
 }
+
+private fun Søknad.tilPeriodeFraOgMed() : LocalDate {
+    return when(this.barn[0].tidspunktForAleneomsorg){
+        TidspunktForAleneomsorg.SISTE_2_ÅRENE -> this.barn[0].dato!!
+        TidspunktForAleneomsorg.TIDLIGERE -> LocalDate.parse("${forrigeÅr()}-01-01")
+    }
+}
+
+private fun forrigeÅr() = LocalDate.now().year.minus(1)

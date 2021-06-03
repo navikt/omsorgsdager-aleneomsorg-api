@@ -13,7 +13,7 @@ class K9FormatTest {
     @Test
     fun `Søknad blir til korrekt k9Format`() {
         val søknadId = UUID.randomUUID().toString()
-        val mottatt = ZonedDateTime.of(2021, 1, 1, 3, 4, 5, 6, ZoneId.of("UTC"))
+        val mottatt = ZonedDateTime.of(2021, 2, 1, 3, 4, 5, 6, ZoneId.of("UTC"))
         val k9Format = SøknadUtils.gyldigSøknad().copy(
             søknadId = søknadId,
             mottatt = mottatt
@@ -24,7 +24,7 @@ class K9FormatTest {
             {
               "søknadId" : "$søknadId",
               "versjon" : "1.0.0",
-              "mottattDato" : "2021-01-01T03:04:05.000Z",
+              "mottattDato" : "2021-02-01T03:04:05.000Z",
               "søker" : {
                 "norskIdentitetsnummer" : "02119970078"
               },
