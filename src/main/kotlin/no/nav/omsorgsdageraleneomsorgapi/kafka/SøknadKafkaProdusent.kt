@@ -56,7 +56,6 @@ class SøknadKafkaProdusent(val kafkaConfig: KafkaConfig) : HealthCheck {
                 )
             )
         ).get()
-        logger.info("SKAL FJERNES FØR PRODSETTING. FORMAT SOM SENDES: ${søknad.somJson()}") // TODO: 26/05/2021  Fjerne
         logger.info(formaterStatuslogging(søknad.søknadId, "sendes til topic ${OMD_ALENEOMSORG_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
     }
 
