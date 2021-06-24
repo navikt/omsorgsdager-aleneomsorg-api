@@ -12,7 +12,7 @@ val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fr
 val fuelVersion = "2.3.1"
 
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.5.20"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
