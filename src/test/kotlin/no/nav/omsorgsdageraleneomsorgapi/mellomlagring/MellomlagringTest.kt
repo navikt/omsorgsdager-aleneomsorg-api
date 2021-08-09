@@ -1,17 +1,15 @@
 package no.nav.omsorgsdageraleneomsorgapi.mellomlagring
 
 import com.github.fppt.jedismock.RedisServer
-import io.ktor.util.*
 import no.nav.omsorgsdageraleneomsorgapi.redis.RedisConfig
 import no.nav.omsorgsdageraleneomsorgapi.redis.RedisStore
 import org.awaitility.Awaitility
 import org.awaitility.Durations
-import org.junit.AfterClass
+import org.junit.jupiter.api.AfterAll
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.test.*
 
-@KtorExperimentalAPI
 class MellomlagringTest {
     private companion object {
         val logger = LoggerFactory.getLogger(MellomlagringTest::class.java)
@@ -35,7 +33,7 @@ class MellomlagringTest {
             "VerySecretPass"
         )
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun teardown() {
             redisClient.shutdown()

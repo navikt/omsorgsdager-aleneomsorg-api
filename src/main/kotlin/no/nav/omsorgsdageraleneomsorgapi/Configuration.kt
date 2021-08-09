@@ -3,7 +3,6 @@ package no.nav.omsorgsdageraleneomsorgapi
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.ktor.config.*
-import io.ktor.util.*
 import no.nav.helse.dusseldorf.ktor.auth.EnforceEqualsOrContains
 import no.nav.helse.dusseldorf.ktor.auth.issuers
 import no.nav.helse.dusseldorf.ktor.auth.withAdditionalClaimRules
@@ -14,7 +13,6 @@ import no.nav.omsorgsdageraleneomsorgapi.kafka.KafkaConfig
 import java.net.URI
 import java.time.Duration
 
-@KtorExperimentalAPI
 data class Configuration(val config : ApplicationConfig) {
 
     private val loginServiceClaimRules = setOf(

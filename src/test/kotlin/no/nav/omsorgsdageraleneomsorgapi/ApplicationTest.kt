@@ -7,7 +7,6 @@ import io.ktor.config.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.ktor.util.*
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.TestUtils.getAuthCookie
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
@@ -21,8 +20,8 @@ import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubK9OppslagSoker
 import no.nav.omsorgsdageraleneomsorgapi.wiremock.stubOppslagHealth
 import org.json.JSONObject
-import org.junit.AfterClass
-import org.junit.BeforeClass
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,7 +35,6 @@ private const val gyldigFodselsnummerA = "290990123456"
 private const val gyldigFodselsnummerB = "25118921464"
 private const val ikkeMyndigFnr = "12125012345"
 
-@KtorExperimentalAPI
 class ApplicationTest {
 
     private companion object {
@@ -78,13 +76,13 @@ class ApplicationTest {
         })
 
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun buildUp() {
             engine.start(wait = true)
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun tearDown() {
             logger.info("Tearing down")
