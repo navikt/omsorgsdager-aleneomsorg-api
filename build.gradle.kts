@@ -1,24 +1,23 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val dusseldorfKtorVersion = "2.1.6.0-ef0acb6"
+val dusseldorfKtorVersion = "2.1.6.2-6ce5eaa"
 val ktorVersion = ext.get("ktorVersion").toString()
 val k9FormatVersion = "5.1.50"
 
 val mainClass = "no.nav.omsorgsdageraleneomsorgapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
 val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fra kafka-embedded-env
-
 val fuelVersion = "2.3.1"
 
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.5.21"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
-    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/ef0acb6425e85073932e8d021e33849110f58159/gradle/dusseldorf-ktor.gradle.kts")
+    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/6ce5eaa4666595bb6b550fca5ca8bbdc242961a0/gradle/dusseldorf-ktor.gradle.kts")
 }
 
 dependencies {
@@ -32,7 +31,6 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel-coroutines:$fuelVersion"){
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
-    implementation("io.ktor:ktor-locations:$ktorVersion")
 
     //K9-format
     implementation("no.nav.k9:soknad:$k9FormatVersion")
@@ -42,7 +40,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
     implementation("io.lettuce:lettuce-core:5.3.5.RELEASE")
-    implementation("com.github.fppt:jedis-mock:0.1.16")
+    implementation("com.github.fppt:jedis-mock:0.1.20")
 
     // Test
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
@@ -54,6 +52,7 @@ dependencies {
     // kafka
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.skyscreamer:jsonassert:1.5.0")
     testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
 }
@@ -69,11 +68,8 @@ repositories {
         }
     }
     mavenCentral()
-    maven("https://dl.bintray.com/kotlin/ktor")
-    maven("https://kotlin.bintray.com/kotlinx")
     maven("https://packages.confluent.io/maven/")
     maven("https://jitpack.io")
-    maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 
@@ -104,5 +100,9 @@ tasks.withType<ShadowJar> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "7.0.2"
+    gradleVersion = "7.1.1"
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

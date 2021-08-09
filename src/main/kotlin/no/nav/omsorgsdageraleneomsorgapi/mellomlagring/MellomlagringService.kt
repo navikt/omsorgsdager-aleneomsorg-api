@@ -1,10 +1,9 @@
 package no.nav.omsorgsdageraleneomsorgapi.mellomlagring
 
-import io.ktor.util.*
 import no.nav.omsorgsdageraleneomsorgapi.redis.RedisStore
 import java.util.*
 
-class MellomlagringService @KtorExperimentalAPI constructor(
+class MellomlagringService constructor(
     private val redisStore: RedisStore,
     private val passphrase: String
 ) {
