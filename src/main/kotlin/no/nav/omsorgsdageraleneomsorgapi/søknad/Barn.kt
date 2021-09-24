@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 data class Barn (
     val navn: String,
-    val aktørId: String?,
+    val aktørId: String,
     var identitetsnummer: String?,
     val tidspunktForAleneomsorg: TidspunktForAleneomsorg,
     val dato: LocalDate? = null

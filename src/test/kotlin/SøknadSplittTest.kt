@@ -14,21 +14,21 @@ class SøknadSplittTest {
             Barn(
                 navn = "Ole",
                 identitetsnummer = "25058118020",
-                aktørId = null,
+                aktørId = "12345",
                 tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
                 dato = LocalDate.parse("2021-01-01")
             ),
             Barn(
                 navn = "Dole",
                 identitetsnummer = "19017822821",
-                aktørId = null,
+                aktørId = "12345",
                 tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
                 dato = LocalDate.parse("2021-01-01")
             ),
             Barn(
                 navn = "Doffen",
                 identitetsnummer = "03127900263",
-                aktørId = null,
+                aktørId = "12345",
                 tidspunktForAleneomsorg = TidspunktForAleneomsorg.SISTE_2_ÅRENE,
                 dato = LocalDate.parse("2021-01-01")
             )
