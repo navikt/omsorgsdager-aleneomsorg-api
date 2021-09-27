@@ -4,8 +4,8 @@ import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
-import org.junit.Test
 import java.time.LocalDate
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class BarnValideringTest {
