@@ -2,8 +2,8 @@ import no.nav.omsorgsdageraleneomsorgapi.SøknadUtils
 import no.nav.omsorgsdageraleneomsorgapi.søknad.Barn
 import no.nav.omsorgsdageraleneomsorgapi.søknad.TidspunktForAleneomsorg
 import no.nav.omsorgsdageraleneomsorgapi.søknad.splittTilSøknadPerBarn
-import org.junit.Test
 import java.time.LocalDate
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SøknadSplittTest {

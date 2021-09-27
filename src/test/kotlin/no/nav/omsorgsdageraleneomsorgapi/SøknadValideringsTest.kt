@@ -3,7 +3,8 @@ package no.nav.omsorgsdageraleneomsorgapi
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
 import no.nav.omsorgsdageraleneomsorgapi.felles.starterMedFodselsdato
 import no.nav.omsorgsdageraleneomsorgapi.søknad.valider
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import kotlin.test.Test
 import kotlin.test.assertTrue
 
 internal class SøknadValideringsTest {
@@ -19,25 +20,31 @@ internal class SøknadValideringsTest {
         SøknadUtils.gyldigSøknad().valider()
     }
 
-    @Test(expected = Throwblem::class)
+    @Test
     fun `Feiler dersom harForståttRettigheterOgPlikter er false`(){
-        SøknadUtils.gyldigSøknad().copy(
-            harForståttRettigheterOgPlikter = false
-        ).valider()
+        Assertions.assertThrows(Throwblem::class.java){
+            SøknadUtils.gyldigSøknad().copy(
+                harForståttRettigheterOgPlikter = false
+            ).valider()
+        }
     }
 
-    @Test(expected = Throwblem::class)
+    @Test
     fun `Feiler dersom harBekreftetOpplysninger er false`(){
-        SøknadUtils.gyldigSøknad().copy(
-            harBekreftetOpplysninger = false
-        ).valider()
+        Assertions.assertThrows(Throwblem::class.java){
+            SøknadUtils.gyldigSøknad().copy(
+                harBekreftetOpplysninger = false
+            ).valider()
+        }
     }
 
-    @Test(expected =  Throwblem::class)
+    @Test
     fun `Feiler dersom barn er tom liste`(){
-        SøknadUtils.gyldigSøknad().copy(
-            barn = listOf()
-        ).valider()
+        Assertions.assertThrows(Throwblem::class.java){
+            SøknadUtils.gyldigSøknad().copy(
+                barn = listOf()
+            ).valider()
+        }
     }
 
 }

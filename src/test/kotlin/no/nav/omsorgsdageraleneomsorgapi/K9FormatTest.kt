@@ -2,11 +2,11 @@ package no.nav.omsorgsdageraleneomsorgapi
 
 import no.nav.k9.søknad.JsonUtils
 import no.nav.omsorgsdageraleneomsorgapi.k9format.tilK9Format
-import org.junit.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.test.Test
 
 class K9FormatTest {
 
