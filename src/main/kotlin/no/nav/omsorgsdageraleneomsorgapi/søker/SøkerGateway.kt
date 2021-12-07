@@ -16,6 +16,7 @@ import no.nav.helse.dusseldorf.ktor.metrics.Operation
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
 import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
 import no.nav.omsorgsdageraleneomsorgapi.general.oppslag.K9OppslagGateway
+import no.nav.omsorgsdageraleneomsorgapi.general.oppslag.throwable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -63,10 +64,11 @@ class SøkerGateway (
 
             result.fold(
                 { success -> objectMapper.readValue<SokerOppslagRespons>(success)},
-                { error ->
-                    logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
-                    logger.error(error.toString())
-                    throw IllegalStateException("Feil ved henting av søkers personinformasjon")
+                { error -> throw error.throwable(
+                        request = request,
+                        logger = logger,
+                        errorMessage = "Feil ved henting av søkers personinformasjon"
+                    )
                 }
             )
         }
