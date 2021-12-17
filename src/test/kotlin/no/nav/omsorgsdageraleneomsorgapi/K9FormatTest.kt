@@ -28,6 +28,9 @@ class K9FormatTest {
               "søker" : {
                 "norskIdentitetsnummer" : "02119970078"
               },
+              "begrunnelseForInnsending": {
+                "tekst": null
+              },
               "ytelse" : {
                 "type" : "OMP_UTV_AO",
                 "barn" : {
