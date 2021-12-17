@@ -1,6 +1,9 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
+  annotations:
+    nais.io/read-only-file-system: "false"
+    nais.io/run-as-user: "999"
   labels:
     team: dusseldorf
   name: omsorgsdager-aleneomsorg-api-redis
