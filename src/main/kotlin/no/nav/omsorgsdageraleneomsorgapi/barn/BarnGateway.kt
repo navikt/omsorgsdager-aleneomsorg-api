@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.httpGet
 import io.ktor.http.*
+import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.helse.dusseldorf.ktor.core.Retry
 import no.nav.helse.dusseldorf.ktor.health.Healthy
@@ -13,7 +14,6 @@ import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
 import no.nav.omsorgsdageraleneomsorgapi.felles.k9SelvbetjeningOppslagKonfigurert
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
-import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
 import no.nav.omsorgsdageraleneomsorgapi.general.oppslag.K9OppslagGateway
 import no.nav.omsorgsdageraleneomsorgapi.general.oppslag.throwable
 import org.slf4j.Logger
