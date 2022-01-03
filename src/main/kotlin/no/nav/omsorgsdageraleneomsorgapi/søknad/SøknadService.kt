@@ -1,10 +1,10 @@
 package no.nav.omsorgsdageraleneomsorgapi.søknad
 
+import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.omsorgsdageraleneomsorgapi.barn.BarnService
 import no.nav.omsorgsdageraleneomsorgapi.felles.Metadata
 import no.nav.omsorgsdageraleneomsorgapi.felles.formaterStatuslogging
 import no.nav.omsorgsdageraleneomsorgapi.general.CallId
-import no.nav.omsorgsdageraleneomsorgapi.general.auth.IdToken
 import no.nav.omsorgsdageraleneomsorgapi.k9format.tilK9Format
 import no.nav.omsorgsdageraleneomsorgapi.kafka.SøknadKafkaProdusent
 import no.nav.omsorgsdageraleneomsorgapi.søker.Søker
