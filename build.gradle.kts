@@ -41,7 +41,7 @@ dependencies {
     implementation("io.lettuce:lettuce-core:5.3.5.RELEASE")
 
     // Test
-    testImplementation("com.github.fppt:jedis-mock:1.0.0")
+    testImplementation("com.github.fppt:jedis-mock:1.0.1")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
