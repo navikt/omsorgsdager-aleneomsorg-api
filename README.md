@@ -1,3 +1,5 @@
+# OBS: Erstattet av https://github.com/navikt/k9-brukerdialog-api
+
 # Omsorgsdager-aleneomsorg-api
 
 ![CI / CD](https://github.com/navikt/omsorgsdager-aleneomsorg-api/workflows/CI%20/%20CD/badge.svg)
